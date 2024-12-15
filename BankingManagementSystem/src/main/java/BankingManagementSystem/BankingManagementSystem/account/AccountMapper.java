@@ -42,7 +42,7 @@ public class AccountMapper {
         // DTO'dan Entity'ye dönüştürme
         public static Account mapToAccount(AccountDto accountDto) {
             Account account = new Account();
-            account.setId(accountDto.getId());
+            //account.setId(accountDto.getId());
            // account.setCustomerId(accountDto.getCustomerId());
             account.setAccountNumber(accountDto.getAccountNumber());
             account.setAccountType(AccountType.valueOf(accountDto.getAccountType())); // String -> Enum
@@ -50,7 +50,7 @@ public class AccountMapper {
 
 
 
-            account.setCreatedDate(accountDto.getCreatedDate());
+            //account.setCreatedDate(accountDto.getCreatedDate());
             //account.setDeleted(accountDto.isDeleted());
             return account;
         }

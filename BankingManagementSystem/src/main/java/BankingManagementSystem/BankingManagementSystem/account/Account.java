@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="ID")
     private Integer id;
     @Column(name = "CustomerID", nullable = false)
     private Integer customerId;
@@ -26,7 +27,7 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
 
-    @Column(name = "Balance", nullable = false)
+    @Column(name = "balance", nullable = false)
     private BigDecimal balance;
 
     @Column(name = "CreatedDate", nullable = false)
