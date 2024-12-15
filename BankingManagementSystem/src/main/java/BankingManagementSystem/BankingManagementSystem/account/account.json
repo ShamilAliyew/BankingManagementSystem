@@ -1,8 +1,5 @@
 {
-  "id":1,
   "accountNumber": 1,
   "accountType": "Saving",
-  "balance": 500,
-  "createdDate": "08.12.2024"
-
+  "balance": 500
 }
