@@ -12,9 +12,10 @@ public class CustomerController {
     private CustomerService customerService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerCustomer(@RequestBody CustomerRegistrationRequest request) {
+    public ResponseEntity<String> registerCustomer(@RequestBody CustomerRegistrationDto customerDto) {
+        System.out.println("Hello");
         try {
-            String response = customerService.registerCustomer(request);
+            String response = customerService.registerCustomer(customerDto);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
