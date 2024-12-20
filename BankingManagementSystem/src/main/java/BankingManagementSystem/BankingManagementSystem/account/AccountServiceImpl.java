@@ -24,13 +24,13 @@ public  class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountDto getAccountById(Integer id) {
+    public AccountDto getAccountById(Long id) {
          Account account=accountRepository.findById(id).orElseThrow(( )-> new  RuntimeException("Account doesn't exists"));
          return AccountMapper.mapToAccountDto(account);
     }
 
     @Override
-    public AccountDto deposit(Integer id, BigDecimal amount) {
+    public AccountDto deposit(Long id, BigDecimal amount) {
         Account account=accountRepository.findById(id).orElseThrow(( )-> new  RuntimeException("Account doesn't exists"));
         account.setBalance(account.getBalance().add(amount));
         Account savedAccount = accountRepository.save(account);
@@ -40,7 +40,7 @@ public  class AccountServiceImpl implements AccountService {
 
 
     @Override
-    public AccountDto withdraw(Integer id, BigDecimal amount) {
+    public AccountDto withdraw(Long id, BigDecimal amount) {
         Account account=accountRepository.findById(id).orElseThrow(( )-> new  RuntimeException("Account doesn't exists"));
     if(account.getBalance().compareTo(amount)<0) {
         throw new  RuntimeException("Insufficient balance");
@@ -63,7 +63,7 @@ public  class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void deleteAccount(Integer id) {
+    public void deleteAccount(Long id) {
         Account account=accountRepository.findById(id).orElseThrow(( )-> new  RuntimeException("Account doesn't exists"));
         accountRepository.deleteById(id);
     }

@@ -1,6 +1,9 @@
 package BankingManagementSystem.BankingManagementSystem.customer;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -8,11 +11,14 @@ import java.time.LocalDateTime;
 
 @Service
 public class CustomerService {
-    @Autowired
-    private CustomerRepository customerRepository;
 
-
+    private final CustomerRepository customerRepository;
     private final BCryptPasswordEncoder passwordEncoder=new BCryptPasswordEncoder();
+
+    public CustomerService(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
+    }
+
 
     public String registerCustomer(CustomerRegistrationDto customerDto) {
         if (customerRepository.findByEmail(customerDto.getEmail()).isPresent()) {
@@ -23,8 +29,7 @@ public class CustomerService {
         customer.setFirstName(customerDto.getFirstName());
         customer.setLastName(customerDto.getLastName());
         customer.setEmail(customerDto.getEmail());
-//        String hashedPassword = passwordEncoder.encode(customerDto.getPassword());
-//        customer.setPassword(hashedPassword);
+        customer.setCustomerRole(customerDto.getCustomerRole());
         customer.setPhone(customerDto.getPhone());
         customer.setAddress(customerDto.getAddress());
         customer.setRegistrationDate(LocalDateTime.now());
@@ -33,5 +38,7 @@ public class CustomerService {
         customerRepository.save(customer);
         return "Customer registered successfully!";
     }
+
+
 
 }

@@ -10,29 +10,21 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AccountDto {
-    private Integer id;
-    //private Integer customerId;
+    private Long customerId;
     private String accountNumber;
     private String accountType;
     private BigDecimal balance;
     private LocalDateTime createdDate;
-    //private boolean isDeleted;
+    private boolean isDeleted;
 
-    public Integer getId() {
-        return id;
+
+    public Long getCustomerId() {
+        return customerId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
     }
-
-//    public Integer getCustomerId() {
-//        return customerId;
-//    }
-//
-//    public void setCustomerId(Integer customerId) {
-//        this.customerId = customerId;
-//    }
 
     public String getAccountNumber() {
         return accountNumber;
@@ -66,11 +58,11 @@ public class AccountDto {
         this.createdDate = createdDate;
     }
 
-//    public boolean isDeleted() {
-//        return isDeleted;
-//    }
-//
-//    public void setDeleted(boolean deleted) {
-//        isDeleted = deleted;
-//    }
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
 }

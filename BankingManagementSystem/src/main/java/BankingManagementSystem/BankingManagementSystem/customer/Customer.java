@@ -1,11 +1,13 @@
 package BankingManagementSystem.BankingManagementSystem.customer;
 
+import BankingManagementSystem.BankingManagementSystem.account.Account;
+import BankingManagementSystem.BankingManagementSystem.account.AccountType;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
+import java.util.List;
 
 
 @Data
@@ -16,22 +18,26 @@ import java.time.LocalDateTime;
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     private String firstName;
     private String lastName;
     @Column(unique = true)
     private String email;
-    private String password;
+    @Column( nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CustomerRole customerRole;
+    @OneToMany(mappedBy = "customer")
+    private List<Account> accounts;
     private String phone;
     private String address;
     private LocalDateTime registrationDate;
     private  boolean isDeleted;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -91,4 +97,11 @@ public class Customer {
         isDeleted = deleted;
     }
 
+    public CustomerRole getCustomerRole() {
+        return customerRole;
+    }
+
+    public void setCustomerRole(CustomerRole customerRole) {
+        this.customerRole = customerRole;
+    }
 }

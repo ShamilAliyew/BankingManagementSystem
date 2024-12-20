@@ -5,9 +5,9 @@ import java.util.List;
 
 public interface AccountService {
     AccountDto createAccount(AccountDto accountDto);
-    AccountDto getAccountById(Integer id);
-    AccountDto deposit(Integer id, BigDecimal amount);
-    AccountDto withdraw(Integer id, BigDecimal amount);
+    AccountDto getAccountById(Long id);
+    AccountDto deposit(Long id, BigDecimal amount);
+    AccountDto withdraw(Long id, BigDecimal amount);
     List<AccountDto> getAllAccounts();
-    void  deleteAccount(Integer id);
+    void  deleteAccount(Long id);
 }

@@ -27,21 +27,21 @@ public class AccountController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<AccountDto> getAccountById(@PathVariable Integer id) {
+    public ResponseEntity<AccountDto> getAccountById(@PathVariable Long id) {
         AccountDto accountDto = accountService.getAccountById(id);
         return  ResponseEntity.ok(accountDto);
     }
 
 
     @PutMapping("/{id}/deposit")
-    public ResponseEntity<AccountDto>deposit(@PathVariable Integer id,@RequestBody Map<String, BigDecimal> request){
+    public ResponseEntity<AccountDto>deposit(@PathVariable Long id,@RequestBody Map<String, BigDecimal> request){
         BigDecimal amount = request.get("amount");
         AccountDto accountDto = accountService.deposit(id, amount);
          return ResponseEntity.ok(accountDto);
     }
 
     @PutMapping("{id}/withdraw")
-    public ResponseEntity<AccountDto> withdraw(@PathVariable Integer id, @RequestBody Map<String, BigDecimal> request){
+    public ResponseEntity<AccountDto> withdraw(@PathVariable Long id, @RequestBody Map<String, BigDecimal> request){
         BigDecimal amount = request.get("amount");
         AccountDto accountDto = accountService.withdraw(id, amount);
 
@@ -55,7 +55,7 @@ public class AccountController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<String> deleteAccount(@PathVariable Integer id) {
+    public ResponseEntity<String> deleteAccount(@PathVariable Long id) {
         accountService.deleteAccount(id);
         return ResponseEntity.ok("Account deleted");
     }

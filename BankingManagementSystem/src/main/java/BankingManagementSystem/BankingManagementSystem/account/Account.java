@@ -1,57 +1,52 @@
 package BankingManagementSystem.BankingManagementSystem.account;
 
+import BankingManagementSystem.BankingManagementSystem.Card.Card;
+import BankingManagementSystem.BankingManagementSystem.customer.Customer;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-@Table(name = "accounts")
-@NoArgsConstructor
-@AllArgsConstructor
-
-
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="ID")
-    private Integer id;
-    @Column(name = "CustomerID", nullable = false)
-    private Integer customerId;
 
-    @Column(name = "AccountNumber", length = 20, nullable = false, unique = true)
+    private Long id;
+
+    @Column( length = 20, nullable = false, unique = true)
     private String accountNumber;
 
-    @Column(name = "AccountType", nullable = false)
+    @Column( nullable = false)
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
 
-    @Column(name = "balance", nullable = false)
+    @ManyToOne()
+    @JoinColumn(name ="customer_id",nullable = false)
+    private Customer customer;
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+    private List<Card> cards;
+
+    @Column( nullable = false)
     private BigDecimal balance;
 
-    @Column(name = "CreatedDate", nullable = false)
+    @Column( nullable = false)
     private LocalDateTime createdDate;
 
-    @Column(name = "IsDeleted", nullable = false)
+    @Column( nullable = false)
     private boolean isDeleted;
 
-
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public Integer getCustomerId() {
-        return customerId;
-    }
 
-    public void setCustomerId(Integer customerId) {
-        this.customerId = customerId;
-    }
 
     public String getAccountNumber() {
         return accountNumber;
@@ -91,5 +86,21 @@ public class Account {
 
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public List<Card> getCards() {
+        return cards;
+    }
+
+    public void setCards(List<Card> cards) {
+        this.cards = cards;
     }
 }

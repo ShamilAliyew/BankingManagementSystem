@@ -4,13 +4,13 @@ package BankingManagementSystem.BankingManagementSystem.customer;
 import lombok.*;
 
 
-@Data
 
+@Data
 public class CustomerRegistrationDto {
     private String firstName;
     private String lastName;
     private String email;
-    private String password;
+    private CustomerRole customerRole;
     private String phone;
     private String address;
 
@@ -38,12 +38,12 @@ public class CustomerRegistrationDto {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public CustomerRole getCustomerRole() {
+        return customerRole;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setCustomerRole(CustomerRole customerRole) {
+        this.customerRole = customerRole;
     }
 
     public String getPhone() {
