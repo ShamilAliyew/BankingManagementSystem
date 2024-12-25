@@ -13,51 +13,51 @@ import java.util.Map;
 @RequestMapping("/api/accounts")
 
 public class AccountController {
-    private final AccountService accountService;
+    private  AccountServiceImp accountServiceImp;
 
-    public AccountController(AccountService accountService) {
-        this.accountService = accountService;
+    public AccountController(AccountServiceImp accountServiceImp) {
+        this.accountServiceImp = accountServiceImp;
     }
 
     @PostMapping
-    public ResponseEntity<AccountDto> addAccount(@RequestBody AccountDto accountDto) {
+    public ResponseEntity<AccountDto> addAccount(@RequestBody CreateAccountDto createAccountDto) {
 
-        return new ResponseEntity<>(accountService.createAccount(accountDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(accountServiceImp.createAccount(createAccountDto), HttpStatus.CREATED);
     }
 
 
-    @GetMapping("/{id}")
-    public ResponseEntity<AccountDto> getAccountById(@PathVariable Long id) {
-        AccountDto accountDto = accountService.getAccountById(id);
-        return  ResponseEntity.ok(accountDto);
-    }
-
-
-    @PutMapping("/{id}/deposit")
-    public ResponseEntity<AccountDto>deposit(@PathVariable Long id,@RequestBody Map<String, BigDecimal> request){
-        BigDecimal amount = request.get("amount");
-        AccountDto accountDto = accountService.deposit(id, amount);
-         return ResponseEntity.ok(accountDto);
-    }
-
-    @PutMapping("{id}/withdraw")
-    public ResponseEntity<AccountDto> withdraw(@PathVariable Long id, @RequestBody Map<String, BigDecimal> request){
-        BigDecimal amount = request.get("amount");
-        AccountDto accountDto = accountService.withdraw(id, amount);
-
-        return ResponseEntity.ok(accountDto);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<AccountDto>> getAllAccounts() {
-        List<AccountDto> accounts = accountService.getAllAccounts();
-        return ResponseEntity.ok(accounts);
-    }
-
-    @DeleteMapping("{id}")
-    public ResponseEntity<String> deleteAccount(@PathVariable Long id) {
-        accountService.deleteAccount(id);
-        return ResponseEntity.ok("Account deleted");
-    }
+//    @GetMapping("/{id}")
+//    public ResponseEntity<AccountDto> getAccountById(@PathVariable Long id) {
+//        AccountDto accountDto = accountServiceImp.getAccountById(id);
+//        return  ResponseEntity.ok(accountDto);
+//    }
+//
+//
+//    @PutMapping("/{id}/deposit")
+//    public ResponseEntity<AccountDto>deposit(@PathVariable Long id,@RequestBody Map<String, BigDecimal> request){
+//        BigDecimal amount = request.get("amount");
+//        AccountDto accountDto = accountService.deposit(id, amount);
+//         return ResponseEntity.ok(accountDto);
+//    }
+//
+//    @PutMapping("{id}/withdraw")
+//    public ResponseEntity<AccountDto> withdraw(@PathVariable Long id, @RequestBody Map<String, BigDecimal> request){
+//        BigDecimal amount = request.get("amount");
+//        AccountDto accountDto = accountService.withdraw(id, amount);
+//
+//        return ResponseEntity.ok(accountDto);
+//    }
+//
+//    @GetMapping
+//    public ResponseEntity<List<AccountDto>> getAllAccounts() {
+//        List<AccountDto> accounts = accountService.getAllAccounts();
+//        return ResponseEntity.ok(accounts);
+//    }
+//
+//    @DeleteMapping("{id}")
+//    public ResponseEntity<String> deleteAccount(@PathVariable Long id) {
+//        accountService.deleteAccount(id);
+//        return ResponseEntity.ok("Account deleted");
+//    }
 
 }

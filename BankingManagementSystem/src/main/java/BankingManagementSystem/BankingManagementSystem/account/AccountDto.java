@@ -6,17 +6,17 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
-
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class AccountDto {
     private Long customerId;
     private String accountNumber;
+    private String password;
     private String accountType;
     private BigDecimal balance;
     private LocalDateTime createdDate;
     private boolean isDeleted;
-
 
     public Long getCustomerId() {
         return customerId;
@@ -32,6 +32,14 @@ public class AccountDto {
 
     public void setAccountNumber(String accountNumber) {
         this.accountNumber = accountNumber;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getAccountType() {
@@ -65,4 +73,5 @@ public class AccountDto {
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
     }
+
 }

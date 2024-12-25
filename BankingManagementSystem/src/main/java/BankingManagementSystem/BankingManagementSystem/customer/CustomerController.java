@@ -1,6 +1,7 @@
 package BankingManagementSystem.BankingManagementSystem.customer;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,13 +13,12 @@ public class CustomerController {
     private CustomerService customerService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerCustomer(@RequestBody CustomerRegistrationDto customerDto) {
-        System.out.println("Hello");
+    public ResponseEntity<CustomerDto> registerCustomer(@RequestBody CustomerRegistrationDto customerRegistrationDto) {
         try {
-            String response = customerService.registerCustomer(customerDto);
-            return ResponseEntity.ok(response);
+            CustomerDto customerDto = customerService.registerCustomer(customerRegistrationDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(customerDto);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 }

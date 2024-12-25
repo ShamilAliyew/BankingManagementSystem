@@ -13,30 +13,28 @@ import java.util.List;
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Long id;
-
     @Column( length = 20, nullable = false, unique = true)
     private String accountNumber;
-
     @Column( nullable = false)
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
-
     @ManyToOne()
     @JoinColumn(name ="customer_id",nullable = false)
     private Customer customer;
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
     private List<Card> cards;
-
+    @Column(nullable = false)
+    private String password;
     @Column( nullable = false)
-    private BigDecimal balance;
+    private BigDecimal balance=BigDecimal.ZERO;
 
     @Column( nullable = false)
     private LocalDateTime createdDate;
 
     @Column( nullable = false)
     private boolean isDeleted;
+
 
     public Long getId() {
         return id;
@@ -45,8 +43,6 @@ public class Account {
     public void setId(Long id) {
         this.id = id;
     }
-
-
 
     public String getAccountNumber() {
         return accountNumber;
@@ -62,6 +58,30 @@ public class Account {
 
     public void setAccountType(AccountType accountType) {
         this.accountType = accountType;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public List<Card> getCards() {
+        return cards;
+    }
+
+    public void setCards(List<Card> cards) {
+        this.cards = cards;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public BigDecimal getBalance() {
@@ -86,21 +106,5 @@ public class Account {
 
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
-
-    public List<Card> getCards() {
-        return cards;
-    }
-
-    public void setCards(List<Card> cards) {
-        this.cards = cards;
     }
 }

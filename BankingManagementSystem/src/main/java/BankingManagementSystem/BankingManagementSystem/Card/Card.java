@@ -14,6 +14,7 @@ public class Card {
     private Long id;
     @Column(nullable = false, unique = true)
     private String cardNumber;
+    private String cardHolderName;
     private LocalDate expirationDate;
     private String cvv;
     private BigDecimal cardBalance;
@@ -27,7 +28,10 @@ public class Card {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private CartType cardType;
-    private BigDecimal limit;
+    private BigDecimal cardLimit;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    public Currency currency;
 
     public Long getId() {
         return id;
@@ -85,6 +89,9 @@ public class Card {
         this.cardBalance = cardBalance;
     }
 
+//
+
+
     public CartType getCardType() {
         return cardType;
     }
@@ -93,12 +100,20 @@ public class Card {
         this.cardType = cardType;
     }
 
-    public BigDecimal getLimit() {
-        return limit;
+    public Currency getCurrency() {
+        return currency;
     }
 
-    public void setLimit(BigDecimal limit) {
-        this.limit = limit;
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
+    }
+
+    public BigDecimal getCardLimit() {
+        return cardLimit;
+    }
+
+    public void setCardLimit(BigDecimal limit) {
+        this.cardLimit = limit;
     }
 
     public Customer getCustomer() {
@@ -108,4 +123,20 @@ public class Card {
     public void setCustomer(Customer customer) {
         this.customer = customer;
     }
+
+    public void setExpirationDate(LocalDate expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
+
+
+    public String getCardHolderName() {
+        return cardHolderName;
+    }
+
+    public void setCardHolderName(String cardName) {
+        this.cardHolderName = cardName;
+    }
+
+
 }

@@ -17,6 +17,8 @@ public class CardDTO {
     private BigDecimal limit;
     private LocalDate expirationDate;
     private boolean isActive;
+    private String currency;
+    private String cardHolderName;
 
     public boolean isActive() {
         return isActive;
@@ -88,5 +90,21 @@ public class CardDTO {
 
     public void setExpirationDate(LocalDate expirationDate) {
         this.expirationDate = expirationDate;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public String getCardHolderName() {
+        return cardHolderName;
+    }
+
+    public void setCardHolderName(String cardHolderName) {
+        this.cardHolderName = cardHolderName;
     }
 }
