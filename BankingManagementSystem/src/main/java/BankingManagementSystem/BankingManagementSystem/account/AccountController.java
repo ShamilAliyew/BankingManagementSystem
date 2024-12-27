@@ -19,7 +19,7 @@ public class AccountController {
         this.accountServiceImp = accountServiceImp;
     }
 
-    @PostMapping
+    @PostMapping("/add_account")
     public ResponseEntity<AccountDto> addAccount(@RequestBody CreateAccountDto createAccountDto) {
 
         return new ResponseEntity<>(accountServiceImp.createAccount(createAccountDto), HttpStatus.CREATED);

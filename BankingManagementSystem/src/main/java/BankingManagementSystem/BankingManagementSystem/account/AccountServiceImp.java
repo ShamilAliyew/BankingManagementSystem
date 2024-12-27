@@ -26,6 +26,7 @@ public class AccountServiceImp {
         return UUID.randomUUID().toString().replace("-", "").substring(0, 12);
     }
 
+    
     public AccountDto createAccount(CreateAccountDto createAccountDto) {
         Optional<Customer> optionalCustomer = customerRepository.findById(createAccountDto.getCustomerId());
                Customer Customer = optionalCustomer .orElseThrow(()-> new RuntimeException("Customer not found"));
