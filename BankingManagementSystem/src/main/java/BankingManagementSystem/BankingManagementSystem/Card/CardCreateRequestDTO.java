@@ -12,6 +12,7 @@ public class CardCreateRequestDTO {
     private String cardName;
     private String cardType;
     private String currency;
+    private  String pin;
     private BigDecimal limit;
 
     public Long getAccountId() {
@@ -40,6 +41,14 @@ public class CardCreateRequestDTO {
 
     public String getCurrency() {
         return currency;
+    }
+
+    public String getPin() {
+        return pin;
+    }
+
+    public void setPin(String pin) {
+        this.pin = pin;
     }
 
     public void setCurrency(String currency) {

@@ -8,6 +8,4 @@ public interface AccountService {
     AccountDto getAccountById(Long id);
     AccountDto deposit(Long id, BigDecimal amount);
     AccountDto withdraw(Long id, BigDecimal amount);
-    List<AccountDto> getAllAccounts();
-    void  deleteAccount(Long id);
 }

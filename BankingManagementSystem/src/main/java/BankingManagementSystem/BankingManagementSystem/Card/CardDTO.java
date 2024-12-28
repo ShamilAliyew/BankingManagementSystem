@@ -1,12 +1,15 @@
 package BankingManagementSystem.BankingManagementSystem.Card;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
+@AllArgsConstructor
 public class CardDTO {
     private Long id;
     private String cardNumber;
@@ -19,6 +22,16 @@ public class CardDTO {
     private boolean isActive;
     private String currency;
     private String cardHolderName;
+
+    public CardDTO(Long id, String cardNumber,  LocalDate expirationDate,String cardType) {
+        this.id = id;
+        this.cardNumber = cardNumber;
+        this.expirationDate = expirationDate;
+        this.cardType = cardType;
+    }
+
+    public CardDTO() {
+    }
 
     public boolean isActive() {
         return isActive;
@@ -107,4 +120,5 @@ public class CardDTO {
     public void setCardHolderName(String cardHolderName) {
         this.cardHolderName = cardHolderName;
     }
+
 }

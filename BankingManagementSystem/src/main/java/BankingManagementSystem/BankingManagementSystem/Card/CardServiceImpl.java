@@ -2,11 +2,13 @@ package BankingManagementSystem.BankingManagementSystem.Card;
 
 import BankingManagementSystem.BankingManagementSystem.account.Account;
 import BankingManagementSystem.BankingManagementSystem.account.AccountRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -32,7 +34,7 @@ public class CardServiceImpl {
         return String.format("%03d", new Random().nextInt(1000));
     }
 
-    public Card createCard(CardCreateRequestDTO cardRequestDTO) {
+    public CardDTO createCard(CardCreateRequestDTO cardRequestDTO) {
         Account account = accountRepository.findById(cardRequestDTO.getAccountId())
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
@@ -42,7 +44,14 @@ public class CardServiceImpl {
         card.setCardHolderName(cardRequestDTO.getCardName());
         card.setCurrency(Currency.valueOf(cardRequestDTO.getCurrency()));
         card.setCardType(CartType.valueOf(cardRequestDTO.getCardType()));
-        card.setCardNumber(generateCardNumber());
+
+        String cardNumValue;
+        do{
+            cardNumValue = generateCardNumber();
+        }while (cardRepository.findByCardNumber(cardNumValue).isPresent());
+        card.setCardNumber(cardNumValue);
+
+        card.setPin(cardRequestDTO.getPin());
         card.setCvv(generateCvv());
         card.setExpirationDate(LocalDate.now().plusYears(5));
         card.setActive(true);
@@ -55,7 +64,24 @@ public class CardServiceImpl {
         } else {
             throw new IllegalArgumentException("Invalid card type: " + cardRequestDTO.getCardType());
         }
-        return cardRepository.save(card);
+        Card savedCard = cardRepository.save(card);
+        return convertToCardDto(savedCard);
+    }
+
+    public CardDTO convertToCardDto(Card card) {
+        CardDTO cardDTO = new CardDTO();
+        cardDTO.setId(card.getId());
+        cardDTO.setCardNumber("**** **** **** " + card.getCardNumber().substring(12));
+        cardDTO.setAccountId(card.getAccount().getId());
+        cardDTO.setCardHolderName(card.getCardHolderName());
+        cardDTO.setCurrency(card.getCurrency().name());
+        cardDTO.setCustomerId(card.getAccount().getCustomer().getId());
+        cardDTO.setCardType(card.getCardType().name());
+        cardDTO.setBalance(card.getCardBalance());
+        cardDTO.setLimit(card.getCardLimit());
+        cardDTO.setExpirationDate(card.getExpirationDate());
+        cardDTO.setActive(card.isActive());
+        return cardDTO;
     }
 
 
@@ -99,6 +125,42 @@ public class CardServiceImpl {
                 })
                 .collect(Collectors.toList());
     }
+    @Transactional
+    void makePayment(String cardNumber, BigDecimal amount){
+        Card card = cardRepository.findByCardNumber(cardNumber)
+                .orElseThrow(() -> new IllegalArgumentException("Card not found"));
+        if(card.getCardType().name().equals(CartType.DEBIT.name())){
+            if(card.getCardBalance().compareTo(amount)<0) {
+                throw new IllegalArgumentException("Insufficent card balance");
+            }
+            card.setCardBalance(card.getCardBalance().subtract(amount));
+
+            Account account = card.getAccount();
+            account.setBalance(account.getBalance().subtract(amount));
+            cardRepository.save(card);
+            accountRepository.save(account);
+        }
+        else if(card.getCardType().name().equals(CartType.CREDIT.name())){
+            card.setCardBalance(card.getCardBalance().add(amount));
+            if(card.getCardLimit().compareTo(card.getCardBalance())<0) {
+                throw new IllegalArgumentException("You have exceeded the limit assigned to the card.");
+            }
+            cardRepository.save(card);
+        }
+    }
+    @Transactional
+    void updateCardLimit(String cardNumber, BigDecimal newLimit){
+        Card card = cardRepository.findByCardNumber(cardNumber)
+                .orElseThrow(() -> new IllegalArgumentException("Card not found"));
+        if (newLimit.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Card limit cannot be negative");
+        }
+        card.setCardLimit(newLimit);
+        cardRepository.save(card);
+
+
+    }
+
 
 
 }

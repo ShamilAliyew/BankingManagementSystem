@@ -17,6 +17,7 @@ public class Card {
     private String cardHolderName;
     private LocalDate expirationDate;
     private String cvv;
+    private String pin;
     private BigDecimal cardBalance;
     private boolean isActive;
     @ManyToOne
@@ -75,6 +76,14 @@ public class Card {
 
     public Account getAccount() {
         return account;
+    }
+
+    public String getPin() {
+        return pin;
+    }
+
+    public void setPin(String pin) {
+        this.pin = pin;
     }
 
     public void setAccount(Account account) {

@@ -1,5 +1,6 @@
 package BankingManagementSystem.BankingManagementSystem.account;
 
+import BankingManagementSystem.BankingManagementSystem.Card.CardDTO;
 import BankingManagementSystem.BankingManagementSystem.Card.CardRepository;
 import BankingManagementSystem.BankingManagementSystem.customer.Customer;
 import BankingManagementSystem.BankingManagementSystem.customer.CustomerRepository;
@@ -8,8 +9,10 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountServiceImp {
@@ -26,14 +29,14 @@ public class AccountServiceImp {
         return UUID.randomUUID().toString().replace("-", "").substring(0, 12);
     }
 
-    
+
     public AccountDto createAccount(CreateAccountDto createAccountDto) {
         Optional<Customer> optionalCustomer = customerRepository.findById(createAccountDto.getCustomerId());
-               Customer Customer = optionalCustomer .orElseThrow(()-> new RuntimeException("Customer not found"));
+               Customer customer = optionalCustomer .orElseThrow(()-> new RuntimeException("Customer not found"));
 
     Account account = new Account();
 
-    account.setCustomer(Customer);
+    account.setCustomer(customer);
     account.setAccountNumber(generateAccountNumber());
     account.setPassword(createAccountDto.getPassword());
     account.setAccountType(AccountType.valueOf(createAccountDto.getAccountType()));
@@ -48,8 +51,9 @@ public class AccountServiceImp {
     public AccountDto convertToAccountDto(Account account) {
         AccountDto accountDto = new AccountDto();
         accountDto.setCustomerId(account.getCustomer().getId());
+        accountDto.setAccountId(account.getId());
         accountDto.setAccountNumber(account.getAccountNumber());
-        accountDto.setPassword(account.getPassword());
+        //accountDto.setPassword(account.getPassword());
         accountDto.setAccountType(String.valueOf(account.getAccountType()));
         accountDto.setBalance(account.getBalance());
         accountDto.setCreatedDate(account.getCreatedDate());
@@ -57,5 +61,29 @@ public class AccountServiceImp {
 
         return accountDto;
     }
+
+    public AccountDto getAccountDetails(Long accountId){
+        Optional<Account> optionalAccount = accountRepository.findById(accountId);
+        Account account = optionalAccount.orElseThrow(()-> new RuntimeException("Account not found"));
+        List<CardDTO> cardDTOList = optionalAccount.get().getCards().stream()
+                .map(card -> new CardDTO(card.getId(),card.getCardNumber(),card.getExpirationDate(),card.getCardType().name()))
+                .toList();
+
+        AccountDto accountDto = new AccountDto();
+        accountDto.setCustomerId(account.getCustomer().getId());
+        accountDto.setAccountId(account.getId());
+        accountDto.setAccountNumber(account.getAccountNumber());
+        accountDto.setAccountType(String.valueOf(account.getAccountType()));
+        accountDto.setBalance(account.getBalance());
+        accountDto.setCards(cardDTOList);
+        accountDto.setCreatedDate(account.getCreatedDate());
+        accountDto.setDeleted(account.isDeleted());
+
+
+        return accountDto;
+
+    }
+
+
 
 }

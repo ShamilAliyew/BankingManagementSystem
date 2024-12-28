@@ -1,9 +1,12 @@
 package BankingManagementSystem.BankingManagementSystem.account;
 
+import BankingManagementSystem.BankingManagementSystem.Card.CardDTO;
 import lombok.*;
 
+import javax.smartcardio.Card;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Data
@@ -11,12 +14,26 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class AccountDto {
     private Long customerId;
+    private Long accountId;
     private String accountNumber;
     private String password;
     private String accountType;
+    private List<CardDTO> cards;
     private BigDecimal balance;
     private LocalDateTime createdDate;
     private boolean isDeleted;
+
+
+
+
+
+    public Long getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(Long accountId) {
+        this.accountId = accountId;
+    }
 
     public Long getCustomerId() {
         return customerId;
@@ -74,4 +91,11 @@ public class AccountDto {
         isDeleted = deleted;
     }
 
+    public List<CardDTO> getCards() {
+        return cards;
+    }
+
+    public void setCards(List<CardDTO> cards) {
+        this.cards = cards;
+    }
 }

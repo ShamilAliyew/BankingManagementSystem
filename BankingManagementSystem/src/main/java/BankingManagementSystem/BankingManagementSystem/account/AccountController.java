@@ -26,11 +26,11 @@ public class AccountController {
     }
 
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<AccountDto> getAccountById(@PathVariable Long id) {
-//        AccountDto accountDto = accountServiceImp.getAccountById(id);
-//        return  ResponseEntity.ok(accountDto);
-//    }
+    @GetMapping("/{id}")
+    public ResponseEntity<AccountDto> getAccountDetails(@PathVariable Long id) {
+        AccountDto accountDto = accountServiceImp.getAccountDetails(id);
+        return  ResponseEntity.ok(accountDto);
+    }
 //
 //
 //    @PutMapping("/{id}/deposit")
@@ -48,11 +48,7 @@ public class AccountController {
 //        return ResponseEntity.ok(accountDto);
 //    }
 //
-//    @GetMapping
-//    public ResponseEntity<List<AccountDto>> getAllAccounts() {
-//        List<AccountDto> accounts = accountService.getAllAccounts();
-//        return ResponseEntity.ok(accounts);
-//    }
+//
 //
 //    @DeleteMapping("{id}")
 //    public ResponseEntity<String> deleteAccount(@PathVariable Long id) {

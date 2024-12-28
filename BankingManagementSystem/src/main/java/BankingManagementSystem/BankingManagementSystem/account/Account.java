@@ -107,4 +107,5 @@ public class Account {
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
     }
+
 }
