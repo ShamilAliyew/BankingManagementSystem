@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,8 +23,8 @@ public class Account {
     @ManyToOne()
     @JoinColumn(name ="customer_id",nullable = false)
     private Customer customer;
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
-    private List<Card> cards;
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.EAGER)
+    private List<Card> cards =new ArrayList<>();
     @Column(nullable = false)
     private String password;
     @Column( nullable = false)

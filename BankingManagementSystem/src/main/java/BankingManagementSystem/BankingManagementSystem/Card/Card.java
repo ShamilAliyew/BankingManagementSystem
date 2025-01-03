@@ -28,7 +28,7 @@ public class Card {
     private Customer customer;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private CartType cardType;
+    private CardType cardType;
     private BigDecimal cardLimit;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -101,11 +101,11 @@ public class Card {
 //
 
 
-    public CartType getCardType() {
+    public CardType getCardType() {
         return cardType;
     }
 
-    public void setCardType(CartType cardType) {
+    public void setCardType(CardType cardType) {
         this.cardType = cardType;
     }
 

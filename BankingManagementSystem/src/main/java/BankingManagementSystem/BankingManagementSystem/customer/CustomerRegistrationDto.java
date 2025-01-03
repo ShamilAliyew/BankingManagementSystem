@@ -3,11 +3,8 @@ package BankingManagementSystem.BankingManagementSystem.customer;
 
 import lombok.*;
 
-
-
 @Data
 public class CustomerRegistrationDto {
-
     private String firstName;
     private String lastName;
     private String email;

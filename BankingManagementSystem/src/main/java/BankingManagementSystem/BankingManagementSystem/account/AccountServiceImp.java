@@ -4,29 +4,43 @@ import BankingManagementSystem.BankingManagementSystem.Card.CardDTO;
 import BankingManagementSystem.BankingManagementSystem.Card.CardRepository;
 import BankingManagementSystem.BankingManagementSystem.customer.Customer;
 import BankingManagementSystem.BankingManagementSystem.customer.CustomerRepository;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class AccountServiceImp {
-    private AccountRepository accountRepository;
+
+    private  AccountRepository accountRepository;
+    @Autowired
+    private  CustomerRepository customerRepository;
+
     public AccountServiceImp(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
 
-    private CustomerRepository customerRepository;
+    public void setCustomerRepository(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
+    }
     private CardRepository cardRepository;
 
+    public void setCardRepository(CardRepository cardRepository) {
+        this.cardRepository = cardRepository;
+    }
 
     private String generateAccountNumber() {
-        return UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+        Random random = new Random();
+        StringBuilder randomPart = new StringBuilder();
+        for(int i=0;i<12;i++){
+            randomPart.append(random.nextInt(10));
+        }
+        return randomPart.toString();
     }
 
 
@@ -78,12 +92,6 @@ public class AccountServiceImp {
         accountDto.setCards(cardDTOList);
         accountDto.setCreatedDate(account.getCreatedDate());
         accountDto.setDeleted(account.isDeleted());
-
-
         return accountDto;
-
     }
-
-
-
 }

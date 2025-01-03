@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DdlMappings">
+    <mapping uuid="6de202e6-a2e1-4578-8905-740c8aa44da3" name="@localhost Mapping">
+      <data-sources db="aa3cb336-23ce-4282-b854-7f8c06439745" />
+    </mapping>
+    <mapping uuid="ba69b3c8-8f1c-4866-a64c-dbf8b66117b7" name="digitalbankdb@localhost Mapping">
+      <data-sources db="c0d30c63-cc6a-4f2a-a50f-3a829693c39c" ddl="717eb8e4-f3fa-46d0-aa39-57bfd14c883e" />
+    </mapping>
+  </component>
+</project>

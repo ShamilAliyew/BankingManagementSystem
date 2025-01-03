@@ -13,7 +13,7 @@ import java.util.Map;
 @RequestMapping("/api/accounts")
 
 public class AccountController {
-    private  AccountServiceImp accountServiceImp;
+    private AccountServiceImp accountServiceImp;
 
     public AccountController(AccountServiceImp accountServiceImp) {
         this.accountServiceImp = accountServiceImp;
@@ -21,9 +21,13 @@ public class AccountController {
 
     @PostMapping("/add_account")
     public ResponseEntity<AccountDto> addAccount(@RequestBody CreateAccountDto createAccountDto) {
-
-        return new ResponseEntity<>(accountServiceImp.createAccount(createAccountDto), HttpStatus.CREATED);
-    }
+        try {
+            AccountDto createdAccount = accountServiceImp.createAccount(createAccountDto);
+        return new ResponseEntity<>(createdAccount, HttpStatus.CREATED);
+        }catch (IllegalArgumentException e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+}
 
 
     @GetMapping("/{id}")

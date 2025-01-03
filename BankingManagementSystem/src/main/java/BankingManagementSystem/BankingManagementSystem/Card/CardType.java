@@ -1,6 +1,6 @@
 package BankingManagementSystem.BankingManagementSystem.Card;
 
-public enum CartType {
+public enum CardType {
     DEBIT,
     CREDIT
 }

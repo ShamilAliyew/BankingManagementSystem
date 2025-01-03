@@ -1,5 +1,6 @@
 package BankingManagementSystem.BankingManagementSystem.customer;
 
+import BankingManagementSystem.BankingManagementSystem.Card.Card;
 import BankingManagementSystem.BankingManagementSystem.account.Account;
 import BankingManagementSystem.BankingManagementSystem.account.AccountType;
 import jakarta.persistence.*;
@@ -7,6 +8,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -26,8 +28,10 @@ public class Customer {
     @Column( nullable = false)
     @Enumerated(EnumType.STRING)
     private CustomerRole customerRole;
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer",fetch = FetchType.EAGER)
     private List<Account> accounts;
+    @OneToMany(mappedBy = "customer",fetch = FetchType.EAGER)
+    private List<Card> card=new ArrayList<>();
     private String phone;
     private String address;
     private LocalDateTime registrationDate;
@@ -103,5 +107,21 @@ public class Customer {
 
     public void setCustomerRole(CustomerRole customerRole) {
         this.customerRole = customerRole;
+    }
+
+    public List<Account> getAccounts() {
+        return accounts;
+    }
+
+    public void setAccounts(List<Account> accounts) {
+        this.accounts = accounts;
+    }
+
+    public List<Card> getCard() {
+        return card;
+    }
+
+    public void setCard(List<Card> card) {
+        this.card = card;
     }
 }

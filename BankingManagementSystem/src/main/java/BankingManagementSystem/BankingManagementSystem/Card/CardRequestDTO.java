@@ -1,18 +1,21 @@
 package BankingManagementSystem.BankingManagementSystem.Card;
 
-import lombok.Builder;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
 
-@Data
-@Builder
-public class CardCreateRequestDTO {
+public class CardRequestDTO {
+    @JsonProperty("accountId")
     private Long accountId;
+    @JsonProperty("cardName")
     private String cardName;
+    @JsonProperty("cardType")
     private String cardType;
+    @JsonProperty("currency")
     private String currency;
-    private  String pin;
+    @JsonProperty("pin")
+    private String pin;
+    @JsonProperty("limit")
     private BigDecimal limit;
 
     public Long getAccountId() {
@@ -43,16 +46,16 @@ public class CardCreateRequestDTO {
         return currency;
     }
 
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
     public String getPin() {
         return pin;
     }
 
     public void setPin(String pin) {
         this.pin = pin;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
     }
 
     public BigDecimal getLimit() {

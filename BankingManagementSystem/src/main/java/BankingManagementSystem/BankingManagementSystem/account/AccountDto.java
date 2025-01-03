@@ -1,6 +1,8 @@
 package BankingManagementSystem.BankingManagementSystem.account;
 
 import BankingManagementSystem.BankingManagementSystem.Card.CardDTO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 
 import javax.smartcardio.Card;
@@ -16,6 +18,7 @@ public class AccountDto {
     private Long customerId;
     private Long accountId;
     private String accountNumber;
+    @JsonIgnore
     private String password;
     private String accountType;
     private List<CardDTO> cards;
