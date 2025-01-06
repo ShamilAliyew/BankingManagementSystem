@@ -4,6 +4,7 @@ import BankingManagementSystem.BankingManagementSystem.Card.CardDTO;
 import BankingManagementSystem.BankingManagementSystem.Card.CardRepository;
 import BankingManagementSystem.BankingManagementSystem.customer.Customer;
 import BankingManagementSystem.BankingManagementSystem.customer.CustomerRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.UUID;
 
 @Service
 public class AccountServiceImp {
@@ -52,6 +52,7 @@ public class AccountServiceImp {
 
     account.setCustomer(customer);
     account.setAccountNumber(generateAccountNumber());
+    account.setEmail(createAccountDto.getEmail());
     account.setPassword(createAccountDto.getPassword());
     account.setAccountType(AccountType.valueOf(createAccountDto.getAccountType()));
     account.setBalance(BigDecimal.ZERO);
@@ -67,6 +68,7 @@ public class AccountServiceImp {
         accountDto.setCustomerId(account.getCustomer().getId());
         accountDto.setAccountId(account.getId());
         accountDto.setAccountNumber(account.getAccountNumber());
+        accountDto.setAccountName(account.getEmail());
         //accountDto.setPassword(account.getPassword());
         accountDto.setAccountType(String.valueOf(account.getAccountType()));
         accountDto.setBalance(account.getBalance());
@@ -76,10 +78,21 @@ public class AccountServiceImp {
         return accountDto;
     }
 
+    public AccountDto login(AccountLoginDTO accountLoginDTO) {
+        Optional<Account> optionalAccount = accountRepository.findByEmail(accountLoginDTO.getEmail());
+           Account account = optionalAccount.orElseThrow(()-> new RuntimeException("No account found matching the email."));
+        if(account.getPassword().equals(accountLoginDTO.getPassword())){
+            return convertToAccountDto(account);
+        }
+        else{
+            throw new RuntimeException("Wrong password");
+        }
+    }
+
     public AccountDto getAccountDetails(Long accountId){
-        Optional<Account> optionalAccount = accountRepository.findById(accountId);
-        Account account = optionalAccount.orElseThrow(()-> new RuntimeException("Account not found"));
-        List<CardDTO> cardDTOList = optionalAccount.get().getCards().stream()
+        Account account=accountRepository.findById(accountId)
+                .orElseThrow(()->new IllegalArgumentException("Account not found"));
+        List<CardDTO> cardDTOList = account.getCards().stream()
                 .map(card -> new CardDTO(card.getId(),card.getCardNumber(),card.getExpirationDate(),card.getCardType().name()))
                 .toList();
 
@@ -94,4 +107,60 @@ public class AccountServiceImp {
         accountDto.setDeleted(account.isDeleted());
         return accountDto;
     }
+    @Transactional
+    void makePayment(String accountNumber, BigDecimal amount){
+        Account account = accountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new IllegalArgumentException("Card not found"));
+            if(amount.compareTo(BigDecimal.ONE)<0) {
+                throw new IllegalArgumentException("Insufficient amount");
+            }
+                if(account.getBalance().compareTo(amount)<0) {
+                    throw new IllegalArgumentException("Insufficient account balance");
+            }
+                BigDecimal cashback = amount.multiply(BigDecimal.valueOf(0.03));
+                BigDecimal updatedBalance = account.getBalance().subtract(amount).add(cashback);
+                account.setBalance(updatedBalance);
+                accountRepository.save(account);
+
+    }
+    @Transactional
+    void deposit (String accountNumber,BigDecimal amount){
+        if (amount.compareTo(BigDecimal.ONE) <=  0) {
+            throw new IllegalArgumentException("Deposit amount must be greater than one");
+        }
+        Account account = accountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(() ->  new RuntimeException("Account not found"));
+        account.setBalance(account.getBalance().add(amount));
+        accountRepository.save(account);
+    }
+
+    @Transactional
+    void withdraw (String accountNumber,BigDecimal amount){
+        if (amount.compareTo(BigDecimal.ONE) <= 0) {
+            throw new IllegalArgumentException("Withdraw amount must be greater than zero");
+        }
+        Account account = accountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(() ->  new RuntimeException("Account not found"));
+        account.setBalance(account.getBalance().subtract(amount));
+        accountRepository.save(account);
+    }
+    @Transactional
+    public void transfer(String senderAccountNumber,String receiverAccountNumber,BigDecimal amount ){
+        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Transfer amount must be greater than zero");
+        }
+        Account senderAccount = accountRepository.findByAccountNumber(senderAccountNumber)
+                .orElseThrow(() ->  new RuntimeException("Sender account not found"));
+        Account receiverAccount = accountRepository.findByAccountNumber(receiverAccountNumber)
+                .orElseThrow(() ->  new RuntimeException("Receiver account not found"));
+        if(senderAccount.getBalance().compareTo(amount)<0){
+            throw new IllegalArgumentException("Insufficient balance for transfer");
+        }
+        senderAccount.setBalance(senderAccount.getBalance().subtract(amount));
+        receiverAccount.setBalance(receiverAccount.getBalance().add(amount));
+        accountRepository.save(senderAccount);
+        accountRepository.save(receiverAccount);
+    }
+
+
 }

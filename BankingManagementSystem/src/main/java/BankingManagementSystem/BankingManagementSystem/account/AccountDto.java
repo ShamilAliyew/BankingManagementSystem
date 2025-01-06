@@ -2,10 +2,8 @@ package BankingManagementSystem.BankingManagementSystem.account;
 
 import BankingManagementSystem.BankingManagementSystem.Card.CardDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 
-import javax.smartcardio.Card;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,6 +16,7 @@ public class AccountDto {
     private Long customerId;
     private Long accountId;
     private String accountNumber;
+    private String accountName;
     @JsonIgnore
     private String password;
     private String accountType;
@@ -27,8 +26,13 @@ public class AccountDto {
     private boolean isDeleted;
 
 
+    public String getAccountName() {
+        return accountName;
+    }
 
-
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
 
     public Long getAccountId() {
         return accountId;

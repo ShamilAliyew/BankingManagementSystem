@@ -11,7 +11,6 @@ import java.util.Optional;
 public interface CardRepository extends JpaRepository<Card, Long> {
 
     List<Card> findByCustomerId(Long customerId);
-
     @Query("SELECT c FROM Card c WHERE c.cardNumber = :cardNumber")
     Optional<Card> findByCardNumber(@Param("cardNumber") String cardNumber);
 }

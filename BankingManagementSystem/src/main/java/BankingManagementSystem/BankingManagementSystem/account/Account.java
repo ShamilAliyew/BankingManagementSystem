@@ -3,7 +3,6 @@ package BankingManagementSystem.BankingManagementSystem.account;
 import BankingManagementSystem.BankingManagementSystem.Card.Card;
 import BankingManagementSystem.BankingManagementSystem.customer.Customer;
 import jakarta.persistence.*;
-import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -15,6 +14,8 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false,unique = true)
+    private String email;
     @Column( length = 20, nullable = false, unique = true)
     private String accountNumber;
     @Column( nullable = false)
@@ -44,6 +45,10 @@ public class Account {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public String getEmail() {return email;}
+
+    public void setEmail(String username) {this.email = username;}
 
     public String getAccountNumber() {
         return accountNumber;

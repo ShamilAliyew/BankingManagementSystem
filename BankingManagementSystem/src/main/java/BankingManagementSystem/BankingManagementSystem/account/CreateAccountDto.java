@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class CreateAccountDto {
     private Long customerId;
+    private String email;
     private String accountType;
     private String password;
 
@@ -30,5 +31,13 @@ public class CreateAccountDto {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

@@ -7,7 +7,7 @@ import lombok.*;
 public class CustomerRegistrationDto {
     private String firstName;
     private String lastName;
-    private String email;
+    private String fin;
     private CustomerRole customerRole;
     private String phone;
     private String address;
@@ -28,12 +28,12 @@ public class CustomerRegistrationDto {
         this.lastName = lastName;
     }
 
-    public String getEmail() {
-        return email;
+    public String getFin() {
+        return fin;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setFin(String fin) {
+        this.fin = fin;
     }
 
     public CustomerRole getCustomerRole() {

@@ -1,9 +1,5 @@
 package BankingManagementSystem.BankingManagementSystem.customer;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,14 +15,14 @@ public class CustomerService {
 
 
     public CustomerDto registerCustomer(CustomerRegistrationDto customerRegistrationDto) {
-        if (customerRepository.findByEmail(customerRegistrationDto.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Email is already in use!");
+        if (customerRepository.findByFin(customerRegistrationDto.getFin()).isPresent()) {
+            throw new IllegalArgumentException("Fin is already in use!");
         }
 
         Customer customer = new Customer();
         customer.setFirstName(customerRegistrationDto.getFirstName());
         customer.setLastName(customerRegistrationDto.getLastName());
-        customer.setEmail(customerRegistrationDto.getEmail());
+        customer.setFin(customerRegistrationDto.getFin());
         customer.setCustomerRole(customerRegistrationDto.getCustomerRole());
         customer.setPhone(customerRegistrationDto.getPhone());
         customer.setAddress(customerRegistrationDto.getAddress());
@@ -42,7 +38,7 @@ public class CustomerService {
         customerDto.setCustomerId(customer.getId());
         customerDto.setFirstName(customer.getFirstName());
         customerDto.setLastName(customer.getLastName());
-        customerDto.setEmail(customer.getEmail());
+        customerDto.setFin(customer.getFin());
         customerDto.setCustomerRole(customer.getCustomerRole());
         customerDto.setPhone(customer.getPhone());
         customerDto.setAddress(customer.getAddress());

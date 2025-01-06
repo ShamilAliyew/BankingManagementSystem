@@ -2,11 +2,9 @@ package BankingManagementSystem.BankingManagementSystem.customer;
 
 import BankingManagementSystem.BankingManagementSystem.Card.Card;
 import BankingManagementSystem.BankingManagementSystem.account.Account;
-import BankingManagementSystem.BankingManagementSystem.account.AccountType;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +13,6 @@ import java.util.List;
 @Data
 @Entity
 @Table
-
-
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +20,7 @@ public class Customer {
     private String firstName;
     private String lastName;
     @Column(unique = true)
-    private String email;
+    private String fin;
     @Column( nullable = false)
     @Enumerated(EnumType.STRING)
     private CustomerRole customerRole;
@@ -61,12 +57,12 @@ public class Customer {
         this.lastName = lastName;
     }
 
-    public String getEmail() {
-        return email;
+    public String getFin() {
+        return fin;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setFin(String email) {
+        this.fin = email;
     }
 
     public String getPhone() {

@@ -12,87 +12,108 @@ import java.util.List;
 public class CardController {
 
     private final CardRepository cardRepository;
-    private  CardServiceImpl cardServiceImpl;
+    private  CardService cardService;
 
-    public CardController(CardServiceImpl cardServiceImpl, CardRepository cardRepository) {
-        this.cardServiceImpl = cardServiceImpl;
+    public CardController(CardService cardService, CardRepository cardRepository) {
+        this.cardService = cardService;
         this.cardRepository = cardRepository;
     }
-
-    @PostMapping("/create")
-    public ResponseEntity<CardDTO> createCard(@RequestBody CardRequestDTO cardRequestDTO){
-        System.out.println("Received CardRequestDTO: " + cardRequestDTO.toString());
-        CardDTO createdCard  = cardServiceImpl.createCard(cardRequestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdCard);
-    }
-    @GetMapping("/{id}")
-    public ResponseEntity<CardDTO>getCardById(@PathVariable Long id) {
+    @PostMapping("/order-debit")
+    public ResponseEntity<CardDTO> orderDebitCard(@RequestBody DebitCardRequest debitCardRequest){
+        System.out.println("Received CardRequestDTO: " + debitCardRequest.toString());
         try{
-        CardDTO cardDetails = cardServiceImpl.getCardById(id);
-        return ResponseEntity.ok(cardDetails);
-    }catch(IllegalArgumentException e){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-    }
-    }
-
-    @PutMapping("/{cardNumber}/limit")
-    public ResponseEntity<String >updateCardLimit(@PathVariable String cardNumber, @RequestParam  BigDecimal newLimit) {
-        cardServiceImpl.updateCardLimit(cardNumber, newLimit);
-        return ResponseEntity.ok("Card limit updated succesfully");
+            CardDTO createdCard = cardService.orderDebitCard(debitCardRequest);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdCard);
+        }catch(IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 
-    @PutMapping("/{cardNumber}/payment")
-    public ResponseEntity<String> makePayment(@PathVariable String cardNumber,@RequestParam  BigDecimal amount) {
-        if(amount.compareTo(BigDecimal.ZERO) <= 0) {
+//    @PostMapping("/create")
+//    public ResponseEntity<CardDTO> orderCreditCard(@RequestBody CreditCardRequest creditCardRequest) {
+//        System.out.println("Received CardRequestDTO: " + creditCardRequest.toString());
+//        try {
+//            CardDTO createdCard = cardService.orderCreditCard(creditCardRequest);
+//            return ResponseEntity.status(HttpStatus.CREATED).body(createdCard);
+//        } catch (IllegalArgumentException e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+//        }
+//    }
+
+
+    @PutMapping("/card-payment")
+    public ResponseEntity<String> makePayment(@RequestBody PaymentRequestCard paymentRequestCard) {
+        if(paymentRequestCard.getAmount().compareTo(BigDecimal.ZERO) <= 0){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Amount must be greater than zero");
         }
         try{
-            cardServiceImpl.makePayment(cardNumber, amount);
+            cardService.makePayment(paymentRequestCard.getCardNumber(), paymentRequestCard.getAmount());
             return ResponseEntity.ok("Payment made succesfully");
         }catch(IllegalArgumentException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @PutMapping("/card-withdraw")
+    public ResponseEntity<String> withdrawFromCard(@RequestBody PaymentRequestCard paymentRequestCard){
+        if(paymentRequestCard.getAmount().compareTo(BigDecimal.ONE)<0){
+            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Amount must be greater than zero");
+        }
+        try{
+            cardService.withdrawFromCard(paymentRequestCard.getCardNumber(),paymentRequestCard.getAmount());
+            return ResponseEntity.ok(paymentRequestCard.getAmount()+" has been charged from your card.");
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+
+    @PutMapping("/card-deposit")
+    public ResponseEntity<String> deposit(@RequestBody PaymentRequestCard paymentRequestCard){
+        if(paymentRequestCard.getAmount().compareTo(BigDecimal.ZERO)<0){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Amount must be greater than zero");
+        }
+        try{
+            cardService.deposit(paymentRequestCard.getCardNumber(),paymentRequestCard.getAmount());
+            return ResponseEntity.ok(paymentRequestCard.getAmount()+ " added to your balance");
+        }catch(IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}/update-pin")
+    public ResponseEntity<String>updatePin(@PathVariable Long id,@RequestParam String oldPin, @RequestParam String newPin){
+        try{
+            cardService.updateCardPin(id,oldPin,newPin);
+            return ResponseEntity.ok("Card Pin updated succesfully");
+        }catch (IllegalArgumentException e){
+            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{cardNumber}/update-limit")
+    public ResponseEntity<String>updateCardLimit(@PathVariable String cardNumber,@RequestParam BigDecimal newLimit) {
+        cardService.updateCardLimit(cardNumber, newLimit);
+        return ResponseEntity.ok("Card limit updated successfully");
+    }
+
     @GetMapping("/{customerId}/all")
     public ResponseEntity<List<CardDTO>>getAllCardsByCustomerId(Long customerId){
         try{
-            List<CardDTO> cardList = cardServiceImpl.getAllCardsByCustomerId(customerId);
+            List<CardDTO> cardList = cardService.getAllCardsByCustomerId(customerId);
             return ResponseEntity.ok(cardList);
         }catch (IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
-    @PutMapping("/{cardNumber}/withdraw")
-    public ResponseEntity<String> withdrawFromCard(@PathVariable String cardNumber, @RequestParam BigDecimal amount){
-        if(amount.compareTo(BigDecimal.ZERO)<0){
-            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Amount must be greater than zero");
-        }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CardDTO>getCardById(@PathVariable Long id){
         try{
-            cardServiceImpl.withdrawFromCard(cardNumber,amount);
-            return ResponseEntity.ok(amount+" has been charged from your card.");
-        }catch (IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
- }
-    @PutMapping("/{cardNumber}/deposit")
-    public ResponseEntity<String> deposit(@PathVariable String cardNumber,@RequestParam BigDecimal amount){
-        if(amount.compareTo(BigDecimal.ZERO)<0){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Amount must be greater than zero");
-        }
-        try{
-            cardServiceImpl.deposit(cardNumber,amount);
-            return ResponseEntity.ok(amount+ " added to your balance");
+            CardDTO cardDetails = cardService.getCardById(id);
+            return ResponseEntity.ok(cardDetails);
         }catch(IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
-    @PutMapping("/{id}/update-pin")
-    public ResponseEntity<String>updatePin(@PathVariable Long id,@RequestParam String oldPin, @RequestParam String newPin){
-        try{
-            cardServiceImpl.updateCardPin(id,oldPin,newPin);
-            return ResponseEntity.ok("Card Pin updated succesfully");
-        }catch (IllegalArgumentException e){
-            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 
