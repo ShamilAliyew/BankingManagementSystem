@@ -1,5 +1,6 @@
 package BankingManagementSystem.BankingManagementSystem.Card;
 
+import BankingManagementSystem.BankingManagementSystem.account.TransferFromAccountRequest;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,17 +30,28 @@ public class CardController {
         }
     }
 
-//    @PostMapping("/create")
-//    public ResponseEntity<CardDTO> orderCreditCard(@RequestBody CreditCardRequest creditCardRequest) {
-//        System.out.println("Received CardRequestDTO: " + creditCardRequest.toString());
-//        try {
-//            CardDTO createdCard = cardService.orderCreditCard(creditCardRequest);
-//            return ResponseEntity.status(HttpStatus.CREATED).body(createdCard);
-//        } catch (IllegalArgumentException e) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-//        }
-//    }
+    @PostMapping("/order-credit")
+    public ResponseEntity<CardDTO> orderCreditCard(@RequestBody CreditCardRequest creditCardRequest) {
+        System.out.println("Received CardRequestDTO: " + creditCardRequest.toString());
+        try {
+            CardDTO createdCard = cardService.orderCreditCard(creditCardRequest);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdCard);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
 
+    @PostMapping("/card-transfer")
+    ResponseEntity<String>transfer(@RequestBody TransferFromCardRequest transferFromCardRequest) {
+        try{
+            cardService.transfer(transferFromCardRequest.getFromCardNumber(),
+                    transferFromCardRequest.getToCardNumber(),
+                    transferFromCardRequest.getAmount());
+            return ResponseEntity.ok("Transfer Successful");
+        }catch (IllegalArgumentException e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @PutMapping("/card-payment")
     public ResponseEntity<String> makePayment(@RequestBody PaymentRequestCard paymentRequestCard) {
@@ -98,7 +110,7 @@ public class CardController {
     }
 
     @GetMapping("/{customerId}/all")
-    public ResponseEntity<List<CardDTO>>getAllCardsByCustomerId(Long customerId){
+    public ResponseEntity<List<CardDTO>>getAllCardsByCustomerId(@PathVariable Long customerId){
         try{
             List<CardDTO> cardList = cardService.getAllCardsByCustomerId(customerId);
             return ResponseEntity.ok(cardList);

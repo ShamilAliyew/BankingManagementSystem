@@ -84,6 +84,43 @@ public class CardService {
 
     }
 
+    public CardDTO orderCreditCard(CreditCardRequest creditCardRequest){
+        if (creditCardRequest == null) {
+            throw new IllegalArgumentException("Card request data cannot be null");
+        }
+        if (creditCardRequest.getAccountId() == null){
+            throw new IllegalArgumentException("Account ID must not be null");
+        }
+        Account account = accountRepository.findById(creditCardRequest.getAccountId())
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+        Customer customer = account.getCustomer();
+        if (customer == null) {
+            throw new IllegalStateException("Account is not associated with any customer");
+        }
+
+        Card card = new Card();
+        card.setCustomer(customer);
+        card.setAccount(account);
+        card.setCardHolderName(creditCardRequest.getCardName());
+        card.setCurrency(Currency.valueOf(creditCardRequest.getCurrency()));
+        card.setCardType(CardType.CREDIT);
+
+        String cardNumValue;
+        do {
+            cardNumValue = generateCardNumber();
+        } while (cardRepository.findByCardNumber(cardNumValue).isPresent());
+        card.setCardNumber(cardNumValue);
+        card.setExpirationDate(LocalDate.now().plusYears(5));
+        card.setCvv(generateCvv());
+        card.setPin(creditCardRequest.getPin());
+        card.setCardBalance(BigDecimal.ZERO);
+        card.setCardLimit(BigDecimal.valueOf(5000));
+        card.setActive(true);
+        Card savedCard = cardRepository.save(card);
+        return convertToCardDto(savedCard);
+
+    }
+
     public CardDTO convertToCardDto(Card card) {
         CardDTO cardDTO = new CardDTO();
         cardDTO.setCustomerId(card.getCustomer().getId());
@@ -158,6 +195,23 @@ public class CardService {
 
         }
         cardRepository.save(card);
+    }
+    public void transfer(String senderCardNum, String receiverCardNum, BigDecimal amount){
+        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Transfer amount must be greater than zero");
+        }
+        Card senderCard = cardRepository.findByCardNumber(senderCardNum)
+                .orElseThrow(()->new IllegalArgumentException("Sender card not found"));
+        Card receiverCard = cardRepository.findByCardNumber(receiverCardNum)
+                .orElseThrow(()->new IllegalArgumentException("Receiver Card not found"));
+        if(amount.compareTo(senderCard.getCardBalance())< 0){
+            throw new IllegalArgumentException("Insufficient balance for transfer");
+        }
+        senderCard.setCardBalance(senderCard.getCardBalance().subtract(amount));
+        receiverCard.setCardBalance(receiverCard.getCardBalance().add(amount));
+        cardRepository.save(senderCard);
+        cardRepository.save(receiverCard);
+
     }
 
     @Transactional
