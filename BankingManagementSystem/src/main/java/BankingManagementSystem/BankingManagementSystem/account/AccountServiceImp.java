@@ -2,6 +2,10 @@ package BankingManagementSystem.BankingManagementSystem.account;
 
 import BankingManagementSystem.BankingManagementSystem.Card.CardDTO;
 import BankingManagementSystem.BankingManagementSystem.Card.CardRepository;
+import BankingManagementSystem.BankingManagementSystem.Transaction.Transaction;
+import BankingManagementSystem.BankingManagementSystem.Transaction.TransactionRepository;
+import BankingManagementSystem.BankingManagementSystem.Transaction.TransactionStatus;
+import BankingManagementSystem.BankingManagementSystem.Transaction.TransactionType;
 import BankingManagementSystem.BankingManagementSystem.customer.Customer;
 import BankingManagementSystem.BankingManagementSystem.customer.CustomerRepository;
 import jakarta.transaction.Transactional;
@@ -20,10 +24,13 @@ public class AccountServiceImp {
     private  AccountRepository accountRepository;
     @Autowired
     private  CustomerRepository customerRepository;
-
-    public AccountServiceImp(AccountRepository accountRepository) {
+    private TransactionRepository transactionRepository;
+    public AccountServiceImp(AccountRepository accountRepository,TransactionRepository transactionRepository) {
         this.accountRepository = accountRepository;
+        this.transactionRepository=transactionRepository;
     }
+
+
 
     public void setCustomerRepository(CustomerRepository customerRepository) {
         this.customerRepository = customerRepository;
@@ -158,8 +165,19 @@ public class AccountServiceImp {
         }
         senderAccount.setBalance(senderAccount.getBalance().subtract(amount));
         receiverAccount.setBalance(receiverAccount.getBalance().add(amount));
+
+        Transaction transaction = new Transaction();
+        transaction.setAmount(amount);
+        transaction.setTransactionType(TransactionType.TRANSFER);
+        transaction.setSourceNumber(senderAccountNumber);
+        transaction.setDestinationNumber(receiverAccountNumber);
+        transaction.setTransactionDate(LocalDateTime.now());
+        transaction.setStatus(TransactionStatus.COMPLETED);
+        transaction.setDescription(null);
+
         accountRepository.save(senderAccount);
         accountRepository.save(receiverAccount);
+        transactionRepository.save(transaction);
     }
 
 
