@@ -127,7 +127,18 @@ public class AccountServiceImp {
                 BigDecimal cashback = amount.multiply(BigDecimal.valueOf(0.03));
                 BigDecimal updatedBalance = account.getBalance().subtract(amount).add(cashback);
                 account.setBalance(updatedBalance);
-                accountRepository.save(account);
+
+        Transaction transaction = new Transaction();
+        transaction.setAmount(amount);
+        transaction.setTransactionType(TransactionType.PAYMENT);
+        transaction.setSourceNumber(accountNumber);
+        transaction.setDestinationNumber(null);
+        transaction.setTransactionDate(LocalDateTime.now());
+        transaction.setStatus(TransactionStatus.COMPLETED);
+        transaction.setDescription(null);
+
+        accountRepository.save(account);
+        transactionRepository.save(transaction);
 
     }
     @Transactional
@@ -138,7 +149,18 @@ public class AccountServiceImp {
         Account account = accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() ->  new RuntimeException("Account not found"));
         account.setBalance(account.getBalance().add(amount));
+
+        Transaction transaction = new Transaction();
+        transaction.setAmount(amount);
+        transaction.setTransactionType(TransactionType.DEPOSIT);
+        transaction.setSourceNumber(null);
+        transaction.setDestinationNumber(accountNumber);
+        transaction.setTransactionDate(LocalDateTime.now());
+        transaction.setStatus(TransactionStatus.COMPLETED);
+        transaction.setDescription(null);
+
         accountRepository.save(account);
+        transactionRepository.save(transaction);
     }
 
     @Transactional
@@ -149,7 +171,18 @@ public class AccountServiceImp {
         Account account = accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() ->  new RuntimeException("Account not found"));
         account.setBalance(account.getBalance().subtract(amount));
+
+        Transaction transaction = new Transaction();
+        transaction.setAmount(amount);
+        transaction.setTransactionType(TransactionType.WITHDRAW);
+        transaction.setSourceNumber(accountNumber);
+        transaction.setDestinationNumber(null);
+        transaction.setTransactionDate(LocalDateTime.now());
+        transaction.setStatus(TransactionStatus.COMPLETED);
+        transaction.setDescription(null);
+
         accountRepository.save(account);
+        transactionRepository.save(transaction);
     }
     @Transactional
     public void transfer(String senderAccountNumber,String receiverAccountNumber,BigDecimal amount ){

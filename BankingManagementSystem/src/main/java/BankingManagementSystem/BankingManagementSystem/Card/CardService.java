@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 @Service
 public class CardService {
     private final CardRepository cardRepository;
-
     private final AccountRepository accountRepository;
 
     public CardService(CardRepository cardRepository, AccountRepository accountRepository) {
