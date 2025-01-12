@@ -80,29 +80,15 @@ public ResponseEntity<AccountDto>login(@RequestBody AccountLoginDTO accountLogin
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-//
-//
-//    @PutMapping("/{id}/deposit")
-//    public ResponseEntity<AccountDto>deposit(@PathVariable Long id,@RequestBody Map<String, BigDecimal> request){
-//        BigDecimal amount = request.get("amount");
-//        AccountDto accountDto = accountService.deposit(id, amount);
-//         return ResponseEntity.ok(accountDto);
-//    }
-//
-//    @PutMapping("{id}/withdraw")
-//    public ResponseEntity<AccountDto> withdraw(@PathVariable Long id, @RequestBody Map<String, BigDecimal> request){
-//        BigDecimal amount = request.get("amount");
-//        AccountDto accountDto = accountService.withdraw(id, amount);
-//
-//        return ResponseEntity.ok(accountDto);
-//    }
-//
-//
-//
-//    @DeleteMapping("{id}")
-//    public ResponseEntity<String> deleteAccount(@PathVariable Long id) {
-//        accountService.deleteAccount(id);
-//        return ResponseEntity.ok("Account deleted");
-//    }
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> delete(@PathVariable Long id){
+        try{
+            accountServiceImp.deleteAccount(id);
+            return ResponseEntity.ok("Account Deleted");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 }

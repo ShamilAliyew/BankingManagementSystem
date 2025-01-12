@@ -8,6 +8,7 @@ import BankingManagementSystem.BankingManagementSystem.Transaction.TransactionSt
 import BankingManagementSystem.BankingManagementSystem.Transaction.TransactionType;
 import BankingManagementSystem.BankingManagementSystem.customer.Customer;
 import BankingManagementSystem.BankingManagementSystem.customer.CustomerRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,6 +59,10 @@ public class AccountServiceImp {
     Account account = new Account();
 
     account.setCustomer(customer);
+    String accountNumValue;
+    do{
+        accountNumValue=generateAccountNumber();
+    }while(accountRepository.findByAccountNumber(accountNumValue).isPresent());
     account.setAccountNumber(generateAccountNumber());
     account.setEmail(createAccountDto.getEmail());
     account.setPassword(createAccountDto.getPassword());
@@ -211,6 +216,15 @@ public class AccountServiceImp {
         accountRepository.save(senderAccount);
         accountRepository.save(receiverAccount);
         transactionRepository.save(transaction);
+    }
+
+    public void deleteAccount(Long id){
+        if(accountRepository.existsById(id)){
+            accountRepository.deleteById(id);
+        }
+        else{
+            throw  new EntityNotFoundException("Account with ID " + id + " not found");
+        }
     }
 
 
