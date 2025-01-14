@@ -7,8 +7,6 @@ import java.math.BigDecimal;
 public class CreditCardRequest {
     @JsonProperty("accountId")
     private Long accountId;
-    @JsonProperty("cardName")
-    private String cardName;
     @JsonProperty("currency")
     private String currency;
     @JsonProperty("pin")
@@ -21,16 +19,7 @@ public class CreditCardRequest {
     public void setAccountId(Long accountId) {
         this.accountId = accountId;
     }
-
-    public String getCardName() {
-        return cardName;
-    }
-
-    public void setCardName(String cardName) {
-        this.cardName = cardName;
-    }
-
-
+    
     public String getCurrency() {
         return currency;
     }

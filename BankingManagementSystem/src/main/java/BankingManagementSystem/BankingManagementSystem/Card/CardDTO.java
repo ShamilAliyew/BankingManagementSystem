@@ -23,11 +23,19 @@ public class CardDTO {
     private String currency;
     private String cardHolderName;
 
-    public CardDTO(Long id, String cardNumber,  LocalDate expirationDate,String cardType) {
+
+    public CardDTO(Long id, Long customerId,Long accountId,String cardNumber,   String cardType, BigDecimal balance, BigDecimal limit, LocalDate expirationDate, boolean isActive, String currency, String cardHolderName) {
         this.id = id;
+        this.customerId = customerId;
+        this.accountId = accountId;
         this.cardNumber = cardNumber;
-        this.expirationDate = expirationDate;
         this.cardType = cardType;
+        this.balance = balance;
+        this.limit = limit;
+        this.expirationDate = expirationDate;
+        this.isActive = isActive;
+        this.currency = currency;
+        this.cardHolderName = cardHolderName;
     }
 
     public CardDTO() {

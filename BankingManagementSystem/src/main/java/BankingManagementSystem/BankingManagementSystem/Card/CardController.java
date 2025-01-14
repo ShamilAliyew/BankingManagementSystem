@@ -1,7 +1,6 @@
 package BankingManagementSystem.BankingManagementSystem.Card;
 
 import BankingManagementSystem.BankingManagementSystem.account.TransferFromAccountRequest;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +12,7 @@ import java.util.List;
 public class CardController {
 
     private final CardRepository cardRepository;
-    private  CardService cardService;
+    private final CardService cardService;
 
     public CardController(CardService cardService, CardRepository cardRepository) {
         this.cardService = cardService;
@@ -21,7 +20,6 @@ public class CardController {
     }
     @PostMapping("/order-debit")
     public ResponseEntity<CardDTO> orderDebitCard(@RequestBody DebitCardRequest debitCardRequest){
-        System.out.println("Received CardRequestDTO: " + debitCardRequest.toString());
         try{
             CardDTO createdCard = cardService.orderDebitCard(debitCardRequest);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdCard);
@@ -32,7 +30,6 @@ public class CardController {
 
     @PostMapping("/order-credit")
     public ResponseEntity<CardDTO> orderCreditCard(@RequestBody CreditCardRequest creditCardRequest) {
-        System.out.println("Received CardRequestDTO: " + creditCardRequest.toString());
         try {
             CardDTO createdCard = cardService.orderCreditCard(creditCardRequest);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdCard);
@@ -60,7 +57,7 @@ public class CardController {
         }
         try{
             cardService.makePayment(paymentRequestCard.getCardNumber(), paymentRequestCard.getAmount());
-            return ResponseEntity.ok("Payment made succesfully");
+            return ResponseEntity.ok("Payment made successfully");
         }catch(IllegalArgumentException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }

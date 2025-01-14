@@ -105,7 +105,17 @@ public class AccountServiceImp {
         Account account=accountRepository.findById(accountId)
                 .orElseThrow(()->new IllegalArgumentException("Account not found"));
         List<CardDTO> cardDTOList = account.getCards().stream()
-                .map(card -> new CardDTO(card.getId(),card.getCardNumber(),card.getExpirationDate(),card.getCardType().name()))
+                .map(card -> new CardDTO(card.getId(),
+                        card.getCustomer().getId(),
+                        card.getAccount().getId(),
+                        card.getCardNumber(),
+                        card.getCardType().name(),
+                        card.getCardBalance(),
+                        card.getCardLimit(),
+                        card.getExpirationDate(),
+                        card.isActive(),
+                        String.valueOf(card.getCurrency()),
+                        card.getCardHolderName()))
                 .toList();
 
         AccountDto accountDto = new AccountDto();

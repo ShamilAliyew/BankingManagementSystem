@@ -1,17 +1,12 @@
 package BankingManagementSystem.BankingManagementSystem.Card;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
-import java.math.BigDecimal;
-
-public class DebitCardRequest {
-    @JsonProperty("accountId")
+@Data
+public class DebitCardRequest{
     private Long accountId;
-    @JsonProperty("cardName")
-    private String cardName;
-    @JsonProperty("currency")
     private String currency;
-    @JsonProperty("pin")
     private String pin;
 
     public Long getAccountId() {
@@ -22,13 +17,6 @@ public class DebitCardRequest {
         this.accountId = accountId;
     }
 
-    public String getCardName() {
-        return cardName;
-    }
-
-    public void setCardName(String cardName) {
-        this.cardName = cardName;
-    }
 
     public String getCurrency() {
         return currency;

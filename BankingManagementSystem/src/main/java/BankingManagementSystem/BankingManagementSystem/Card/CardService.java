@@ -64,7 +64,7 @@ public class CardService {
         Card card = new Card();
         card.setCustomer(customer);
         card.setAccount(account);
-        card.setCardHolderName(debitCardRequest.getCardName());
+        card.setCardHolderName("Mr."+ customer.getFirstName()+" "+customer.getLastName());
         card.setCurrency(Currency.valueOf(debitCardRequest.getCurrency()));
         card.setCardType(CardType.DEBIT);
 
@@ -100,7 +100,7 @@ public class CardService {
         Card card = new Card();
         card.setCustomer(customer);
         card.setAccount(account);
-        card.setCardHolderName(creditCardRequest.getCardName());
+        card.setCardHolderName("Mr."+customer.getFirstName()+" "+customer.getLastName());
         card.setCurrency(Currency.valueOf(creditCardRequest.getCurrency()));
         card.setCardType(CardType.CREDIT);
 

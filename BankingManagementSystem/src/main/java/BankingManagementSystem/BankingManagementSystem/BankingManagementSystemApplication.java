@@ -2,6 +2,7 @@ package BankingManagementSystem.BankingManagementSystem;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class BankingManagementSystemApplication {
@@ -10,5 +11,7 @@ public class BankingManagementSystemApplication {
 
 		SpringApplication.run(BankingManagementSystemApplication.class, args);
 	}
+
+
 
 }
