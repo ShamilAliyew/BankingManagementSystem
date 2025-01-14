@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 public class PaymentRequestCard {
     private String cardNumber;
+    private String cvv;
     private BigDecimal amount;
 
     public String getCardNumber(){
@@ -20,5 +21,13 @@ public class PaymentRequestCard {
 
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
+    }
+
+    public String getCvv() {
+        return cvv;
+    }
+
+    public void setCvv(String cvv) {
+        this.cvv = cvv;
     }
 }

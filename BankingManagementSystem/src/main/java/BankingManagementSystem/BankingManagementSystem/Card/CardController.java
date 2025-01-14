@@ -45,7 +45,7 @@ public class CardController {
                     transferFromCardRequest.getAmount());
             return ResponseEntity.ok("Transfer Successful");
         }catch (IllegalArgumentException e){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
@@ -55,8 +55,9 @@ public class CardController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Amount must be greater than zero");
         }
         try{
-            cardService.makePayment(paymentRequestCard.getCardNumber(), paymentRequestCard.getAmount());
-            return ResponseEntity.ok("Payment made successfully");
+            cardService.makePayment(paymentRequestCard.getCardNumber(),paymentRequestCard.getCvv() ,paymentRequestCard.getAmount());
+            BigDecimal cashback = paymentRequestCard.getAmount().multiply(BigDecimal.valueOf(0.05));
+            return ResponseEntity.ok("Payment made successfully\nCashback: "+cashback);
         }catch(IllegalArgumentException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -90,9 +91,9 @@ public class CardController {
     }
 
     @PutMapping("/{id}/update-pin")
-    public ResponseEntity<String>updatePin(@PathVariable Long id,@RequestParam String oldPin, @RequestParam String newPin){
+    public ResponseEntity<String>updatePin(@PathVariable Long id,@RequestBody UpdatePinRequest updatePinRequest){
         try{
-            cardService.updateCardPin(id,oldPin,newPin);
+            cardService.updateCardPin(id,updatePinRequest.getOldPin(),updatePinRequest.getNewPin());
             return ResponseEntity.ok("Card Pin updated successfully");
         }catch (IllegalArgumentException e){
             return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

@@ -51,7 +51,7 @@ public class CardService {
         if (newPin == null || newPin.isEmpty()) {
             throw new IllegalArgumentException("Pin can not be empty or null");
         }
-        if (newPin.matches("\\d{4}")) {
+        if (!newPin.matches("\\d{4}")) {
             throw new IllegalArgumentException("PIN must be 4 long and contain only numbers");
 
         }
@@ -188,22 +188,37 @@ public class CardService {
     }
 
     @Transactional
-    void makePayment(String cardNumber, BigDecimal amount) {
+    void makePayment(String cardNumber,String cvv ,BigDecimal amount) {
         Card card = cardRepository.findByCardNumber(cardNumber)
                 .orElseThrow(() -> new IllegalArgumentException("Card not found"));
-        if (card.getCardType().name().equals(CardType.DEBIT.name())) {
-            if (card.getCardBalance().compareTo(amount) < 0) {
-                throw new IllegalArgumentException("Insufficient card balance");
-            }
-            card.setCardBalance(card.getCardBalance().subtract(amount));
-        } else if (card.getCardType().name().equals(CardType.CREDIT.name())) {
-            card.setCardBalance(card.getCardBalance().add(amount));
-            if (card.getCardLimit().compareTo(card.getCardBalance()) < 0) {
-                throw new IllegalArgumentException("You have exceeded the limit assigned to the card.");
+        if(card.getCvv().equals(cvv)){
+            if (card.getCardType().name().equals(CardType.DEBIT.name())) {
+                if (card.getCardBalance().compareTo(amount) < 0) {
+                    throw new IllegalArgumentException("Insufficient card balance");
+                }
+                BigDecimal cashbask = amount.multiply(BigDecimal.valueOf(0.05));
+                card.setCardBalance(card.getCardBalance().subtract(amount).add(cashbask));
+            } else if (card.getCardType().name().equals(CardType.CREDIT.name())) {
+                card.setCardBalance(card.getCardBalance().add(amount));
+                if (card.getCardLimit().compareTo(card.getCardBalance()) < 0) {
+                    throw new IllegalArgumentException("You have exceeded the limit assigned to the card.");
+                }
+
             }
 
+        }else{
+            throw new IllegalArgumentException("Incorrect card cvv");
         }
+        Transaction transaction = new Transaction();
+        transaction.setAmount(amount);
+        transaction.setTransactionType(TransactionType.PAYMENT);
+        transaction.setSourceNumber(cardNumber);
+        transaction.setDestinationNumber(null);
+        transaction.setTransactionDate(LocalDateTime.now());
+        transaction.setStatus(TransactionStatus.COMPLETED);
+        transaction.setDescription(null);
         cardRepository.save(card);
+        transactionRepository.save(transaction);
     }
     @Transactional
     public void transfer(String senderCardNum, String receiverCardNum, BigDecimal amount){
@@ -214,7 +229,7 @@ public class CardService {
                 .orElseThrow(()->new IllegalArgumentException("Sender card not found"));
         Card receiverCard = cardRepository.findByCardNumber(receiverCardNum)
                 .orElseThrow(()->new IllegalArgumentException("Receiver Card not found"));
-        if(amount.compareTo(senderCard.getCardBalance())< 0){
+        if(senderCard.getCardBalance().compareTo(amount)< 0){
             throw new IllegalArgumentException("Insufficient balance for transfer");
         }
         senderCard.setCardBalance(senderCard.getCardBalance().subtract(amount));
@@ -238,38 +253,34 @@ public class CardService {
     public void withdrawFromCard(String cardNumber, BigDecimal amount, String pin) {
         Card card = cardRepository.findByCardNumber(cardNumber)
                 .orElseThrow(() -> new RuntimeException("Card not found"));
-        if (amount.compareTo(BigDecimal.ONE) < 0) {
-            throw new IllegalArgumentException("Amount can't be lower than zero");
+        if (amount.compareTo(BigDecimal.ZERO) < 1) {
+            throw new IllegalArgumentException("Amount can't be lower than one");
         }
-        if(card.getPin().equals(pin)) {
-            if (card.getCardType().name().equals(CardType.DEBIT.name())) {
-                if (card.getCardBalance().compareTo(amount) >= 0) {
-                    card.setCardBalance(card.getCardBalance().subtract(amount));
-
-                    Transaction transaction = new Transaction();
-                    transaction.setAmount(amount);
-                    transaction.setTransactionType(TransactionType.WITHDRAW);
-                    transaction.setSourceNumber(cardNumber);
-                    transaction.setDestinationNumber(null);
-                    transaction.setTransactionDate(LocalDateTime.now());
-                    transaction.setStatus(TransactionStatus.COMPLETED);
-                    transaction.setDescription(null);
-
-                    cardRepository.save(card);
-                    transactionRepository.save(transaction);
-                } else {
-                    throw new IllegalArgumentException("Insufficient card balance!");
-                }
-            } else {
-                throw new IllegalArgumentException("You cannot withdraw money from a card other than a debit card");
-            }
-
-        }else{
+        if(!card.getPin().equals(pin)) {
             throw new IllegalArgumentException("Incorrect pin");
         }
+        if (!card.getCardType().equals(CardType.DEBIT)) {
+            throw new IllegalArgumentException("You cannot withdraw money from a card other than a debit card");
+        }
+        if (card.getCardBalance().compareTo(amount) < 0) {
+            throw new IllegalArgumentException("Insufficient card balance!");
+        }
+        card.setCardBalance(card.getCardBalance().subtract(amount));
 
+        Transaction transaction = new Transaction();
+        transaction.setAmount(amount);
+        transaction.setTransactionType(TransactionType.WITHDRAW);
+        transaction.setSourceNumber(cardNumber);
+        transaction.setDestinationNumber("null");
+        transaction.setTransactionDate(LocalDateTime.now());
+        transaction.setStatus(TransactionStatus.COMPLETED);
+        transaction.setDescription("null");
+
+        cardRepository.save(card);
+        transactionRepository.save(transaction);
 
     }
+
 
     @Transactional
     void deposit(String cardNumber, BigDecimal amount) {
