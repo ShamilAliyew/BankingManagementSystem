@@ -1,24 +1,34 @@
 package BankingManagementSystem.BankingManagementSystem.Card;
 
+import BankingManagementSystem.BankingManagementSystem.Transaction.Transaction;
+import BankingManagementSystem.BankingManagementSystem.Transaction.TransactionRepository;
+import BankingManagementSystem.BankingManagementSystem.Transaction.TransactionStatus;
+import BankingManagementSystem.BankingManagementSystem.Transaction.TransactionType;
 import BankingManagementSystem.BankingManagementSystem.account.Account;
 import BankingManagementSystem.BankingManagementSystem.account.AccountRepository;
 import BankingManagementSystem.BankingManagementSystem.customer.Customer;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.*;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 @Service
 public class CardService {
     private final CardRepository cardRepository;
     private final AccountRepository accountRepository;
+    private TransactionRepository transactionRepository;
 
-    public CardService(CardRepository cardRepository, AccountRepository accountRepository) {
+    public CardService(CardRepository cardRepository,
+                       AccountRepository accountRepository,
+                       TransactionRepository transactionRepository) {
         this.cardRepository = cardRepository;
         this.accountRepository = accountRepository;
+        this.transactionRepository = transactionRepository;
     }
 
 
@@ -195,6 +205,7 @@ public class CardService {
         }
         cardRepository.save(card);
     }
+    @Transactional
     public void transfer(String senderCardNum, String receiverCardNum, BigDecimal amount){
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Transfer amount must be greater than zero");
@@ -208,28 +219,55 @@ public class CardService {
         }
         senderCard.setCardBalance(senderCard.getCardBalance().subtract(amount));
         receiverCard.setCardBalance(receiverCard.getCardBalance().add(amount));
+
+        Transaction transaction = new Transaction();
+        transaction.setAmount(amount);
+        transaction.setTransactionType(TransactionType.TRANSFER);
+        transaction.setSourceNumber(senderCardNum);
+        transaction.setDestinationNumber(receiverCardNum);
+        transaction.setTransactionDate(LocalDateTime.now());
+        transaction.setStatus(TransactionStatus.COMPLETED);
+        transaction.setDescription(null);
         cardRepository.save(senderCard);
         cardRepository.save(receiverCard);
+        transactionRepository.save(transaction);
 
     }
 
     @Transactional
-    public void withdrawFromCard(String cardNumber, BigDecimal amount) {
+    public void withdrawFromCard(String cardNumber, BigDecimal amount, String pin) {
         Card card = cardRepository.findByCardNumber(cardNumber)
                 .orElseThrow(() -> new RuntimeException("Card not found"));
         if (amount.compareTo(BigDecimal.ONE) < 0) {
             throw new IllegalArgumentException("Amount can't be lower than zero");
         }
-        if (card.getCardType().name().equals(CardType.DEBIT.name())) {
-            if (card.getCardBalance().compareTo(amount) >= 0) {
-                card.setCardBalance(card.getCardBalance().subtract(amount));
-                cardRepository.save(card);
+        if(card.getPin().equals(pin)) {
+            if (card.getCardType().name().equals(CardType.DEBIT.name())) {
+                if (card.getCardBalance().compareTo(amount) >= 0) {
+                    card.setCardBalance(card.getCardBalance().subtract(amount));
+
+                    Transaction transaction = new Transaction();
+                    transaction.setAmount(amount);
+                    transaction.setTransactionType(TransactionType.WITHDRAW);
+                    transaction.setSourceNumber(cardNumber);
+                    transaction.setDestinationNumber(null);
+                    transaction.setTransactionDate(LocalDateTime.now());
+                    transaction.setStatus(TransactionStatus.COMPLETED);
+                    transaction.setDescription(null);
+
+                    cardRepository.save(card);
+                    transactionRepository.save(transaction);
+                } else {
+                    throw new IllegalArgumentException("Insufficient card balance!");
+                }
             } else {
-                throw new IllegalArgumentException("Insufficient card balance!");
+                throw new IllegalArgumentException("You cannot withdraw money from a card other than a debit card");
             }
-        } else {
-            throw new IllegalArgumentException("You cannot withdraw money from a card other than a debit card");
+
+        }else{
+            throw new IllegalArgumentException("Incorrect pin");
         }
+
 
     }
 
@@ -240,9 +278,22 @@ public class CardService {
         }
         Card card = cardRepository.findByCardNumber(cardNumber)
                 .orElseThrow(() -> new RuntimeException("Card not found"));
+
+
         if (card.getCardType().name().equals(CardType.DEBIT.name())) {
             card.setCardBalance(card.getCardBalance().add(amount));
+
+            Transaction transaction = new Transaction();
+            transaction.setAmount(amount);
+            transaction.setTransactionType(TransactionType.DEPOSIT);
+            transaction.setSourceNumber(null);
+            transaction.setDestinationNumber(cardNumber);
+            transaction.setTransactionDate(LocalDateTime.now());
+            transaction.setStatus(TransactionStatus.COMPLETED);
+            transaction.setDescription(null);
+
             cardRepository.save(card);
+            transactionRepository.save(transaction);
         } else {
             throw new IllegalArgumentException("You cannot deposit money from a card other than a debit card");
         }

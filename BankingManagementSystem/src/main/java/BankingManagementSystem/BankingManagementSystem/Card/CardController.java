@@ -1,6 +1,5 @@
 package BankingManagementSystem.BankingManagementSystem.Card;
 
-import BankingManagementSystem.BankingManagementSystem.account.TransferFromAccountRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +38,7 @@ public class CardController {
     }
 
     @PostMapping("/card-transfer")
-    ResponseEntity<String>transfer(@RequestBody TransferFromCardRequest transferFromCardRequest) {
+    public  ResponseEntity<String> transfer(@RequestBody TransferFromCardRequest transferFromCardRequest) {
         try{
             cardService.transfer(transferFromCardRequest.getFromCardNumber(),
                     transferFromCardRequest.getToCardNumber(),
@@ -50,7 +49,7 @@ public class CardController {
         }
     }
 
-    @PutMapping("/card-payment")
+    @PostMapping("/card-payment")
     public ResponseEntity<String> makePayment(@RequestBody PaymentRequestCard paymentRequestCard) {
         if(paymentRequestCard.getAmount().compareTo(BigDecimal.ZERO) <= 0){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Amount must be greater than zero");
@@ -63,28 +62,28 @@ public class CardController {
         }
     }
 
-    @PutMapping("/card-withdraw")
-    public ResponseEntity<String> withdrawFromCard(@RequestBody PaymentRequestCard paymentRequestCard){
-        if(paymentRequestCard.getAmount().compareTo(BigDecimal.ONE)<0){
+    @PostMapping("/card-withdraw")
+    public ResponseEntity<String> withdrawFromCard(@RequestBody CardWithdrawRequest cardWithdraw){
+        if(cardWithdraw.getAmount().compareTo(BigDecimal.ONE)<0){
             return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Amount must be greater than zero");
         }
         try{
-            cardService.withdrawFromCard(paymentRequestCard.getCardNumber(),paymentRequestCard.getAmount());
-            return ResponseEntity.ok(paymentRequestCard.getAmount()+" has been charged from your card.");
+            cardService.withdrawFromCard(cardWithdraw.getCardNumber(),cardWithdraw.getAmount(),cardWithdraw.getPin());
+            return ResponseEntity.ok(cardWithdraw.getAmount()+" has been charged from your card.");
         }catch (IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
 
-    @PutMapping("/card-deposit")
-    public ResponseEntity<String> deposit(@RequestBody PaymentRequestCard paymentRequestCard){
-        if(paymentRequestCard.getAmount().compareTo(BigDecimal.ZERO)<0){
+    @PostMapping("/card-deposit")
+    public ResponseEntity<String> deposit(@RequestBody CardDepositRequest cardDeposit){
+        if(cardDeposit.getAmount().compareTo(BigDecimal.ZERO)<0){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Amount must be greater than zero");
         }
         try{
-            cardService.deposit(paymentRequestCard.getCardNumber(),paymentRequestCard.getAmount());
-            return ResponseEntity.ok(paymentRequestCard.getAmount()+ " added to your balance");
+            cardService.deposit(cardDeposit.getCardNumber(),cardDeposit.getAmount());
+            return ResponseEntity.ok(cardDeposit.getAmount()+ " added to your balance");
         }catch(IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -94,7 +93,7 @@ public class CardController {
     public ResponseEntity<String>updatePin(@PathVariable Long id,@RequestParam String oldPin, @RequestParam String newPin){
         try{
             cardService.updateCardPin(id,oldPin,newPin);
-            return ResponseEntity.ok("Card Pin updated succesfully");
+            return ResponseEntity.ok("Card Pin updated successfully");
         }catch (IllegalArgumentException e){
             return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }

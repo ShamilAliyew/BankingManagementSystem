@@ -12,7 +12,7 @@ public class Card {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, name = "card_number")
     private String cardNumber;
     private String cardHolderName;
     private LocalDate expirationDate;
