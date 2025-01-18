@@ -21,6 +21,9 @@ public class CustomerService {
 
         Customer customer = new Customer();
         customer.setFirstName(customerRegistrationDto.getFirstName());
+        if(customerRegistrationDto.getFin().length()!=7){
+            throw new IllegalArgumentException("Fin must consist of 7 characters");
+        }
         customer.setLastName(customerRegistrationDto.getLastName());
         customer.setFin(customerRegistrationDto.getFin());
         customer.setCustomerRole(customerRegistrationDto.getCustomerRole());
