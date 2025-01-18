@@ -190,6 +190,9 @@ public class CardService {
     void makePayment(String cardNumber,String cvv ,BigDecimal amount) {
         Card card = cardRepository.findByCardNumber(cardNumber)
                 .orElseThrow(() -> new IllegalArgumentException("Card not found"));
+        if(!card.isActive()){
+            throw new IllegalArgumentException("Card is not active.You can not perform financial operations");
+        }
         if(card.getCvv().equals(cvv)){
             if (card.getCardType().name().equals(CardType.DEBIT.name())) {
                 if (card.getCardBalance().compareTo(amount) < 0) {
@@ -221,24 +224,29 @@ public class CardService {
     }
     @Transactional
     public void transfer(String senderCardNum, String receiverCardNum, BigDecimal amount){
-        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Transfer amount must be greater than zero");
         }
         Card senderCard = cardRepository.findByCardNumber(senderCardNum)
                 .orElseThrow(()->new IllegalArgumentException("Sender card not found"));
         Card receiverCard = cardRepository.findByCardNumber(receiverCardNum)
                 .orElseThrow(()->new IllegalArgumentException("Receiver Card not found"));
-
-        if(senderCard.getCardType().equals(CardType.DEBIT)) {
+        if(!senderCard.isActive()){
+            throw new IllegalArgumentException("Sender card is not active.You can not perform financial operations");
+        }
+        if(!receiverCard.isActive()){
+            throw new IllegalArgumentException("Receiver card is not active.You can not perform financial operations");
+        }
+        if(senderCard.getCardType().name().equals(CardType.DEBIT.name())) {
             if(senderCard.getCardBalance().compareTo(amount)< 0 ){
                 throw new IllegalArgumentException("Insufficient balance for transfer");
             }
             senderCard.setCardBalance(senderCard.getCardBalance().subtract(amount));
 
         }
-        if(senderCard.getCardType().equals(CardType.CREDIT)){
-            if(senderCard.getCardLimit().compareTo(senderCard.getCardBalance().abs())<= 0 ){
-                throw new IllegalArgumentException("You are over the card limit.");
+        if(senderCard.getCardType().name().equals(CardType.CREDIT.name())){
+            if(senderCard.getCardLimit().compareTo(senderCard.getCardBalance().abs()) <= 0 ){
+                throw new IllegalArgumentException("Transaction declined: Your card balance exceeds the allowed limit.");
             }
             senderCard.setCardBalance(senderCard.getCardBalance().subtract(amount));
         }
@@ -262,6 +270,9 @@ public class CardService {
     public void withdrawFromCard(String cardNumber, BigDecimal amount, String pin) {
         Card card = cardRepository.findByCardNumber(cardNumber)
                 .orElseThrow(() -> new RuntimeException("Card not found"));
+        if(!card.isActive()){
+            throw new IllegalArgumentException("Card is not active.You can not perform financial operations");
+        }
         if (amount.compareTo(BigDecimal.ZERO) < 1) {
             throw new IllegalArgumentException("Amount can't be lower than one");
         }
@@ -294,7 +305,7 @@ public class CardService {
         Card card=cardRepository.findByCardNumber(cardNum)
                 .orElseThrow(()->new IllegalArgumentException("Card not found"));
 
-        BigDecimal balance=card.getCardBalance();
+        BigDecimal balance = card.getCardBalance();
 
         return balance;
     }
@@ -308,7 +319,9 @@ public class CardService {
         Card card = cardRepository.findByCardNumber(cardNumber)
                 .orElseThrow(() -> new RuntimeException("Card not found"));
 
-
+        if(!card.isActive()){
+            throw new IllegalArgumentException("Card is not active.You can not perform financial operations");
+        }
         if (card.getCardType().name().equals(CardType.DEBIT.name())){
             card.setCardBalance(card.getCardBalance().add(amount));
             Transaction transaction = new Transaction();
