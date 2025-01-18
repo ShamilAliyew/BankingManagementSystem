@@ -125,5 +125,49 @@ public class CardController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
+    @GetMapping("{cardNumber}/balance")
+    public ResponseEntity<BigDecimal>getBalance(@PathVariable String cardNumber){
+        if(cardNumber.length()!=16){
+            throw new IllegalArgumentException("Card number length must be 16");
+        }
+        try {
+            BigDecimal balance = cardService.showBalance(cardNumber);
+            return ResponseEntity.ok(balance);
+        }catch (IllegalArgumentException e){
+            throw new IllegalArgumentException("Card number is invalid");
+        }
+    }
+
+    @PutMapping("{cardNumber}/block")
+    public  ResponseEntity<String>blockCard(@PathVariable String cardNumber){
+        if(cardNumber.length()!=16){
+            throw new IllegalArgumentException("Card number length must be 16");
+        }
+        try {
+            cardService.blockCard(cardNumber);
+            return ResponseEntity.ok().body("Card Blocked. You can not perform operations with the card");
+        }catch (IllegalArgumentException e){
+            throw new IllegalArgumentException("Card number is invalid");
+        }
+    }
+
+    @PutMapping("{cardNumber}/activate")
+    public  ResponseEntity<String>activateCard(@PathVariable String cardNumber){
+        if(cardNumber.length()!=16){
+            throw new IllegalArgumentException("Card number length must be 16");
+        }
+        try {
+            cardService.activateCard(cardNumber);
+            return ResponseEntity.ok().body("Card Activated. You can perform operations with the card");
+        }catch (IllegalArgumentException e){
+            throw new IllegalArgumentException("Card number is invalid");
+        }
+    }
 
 }
+
+
+
+
+
+

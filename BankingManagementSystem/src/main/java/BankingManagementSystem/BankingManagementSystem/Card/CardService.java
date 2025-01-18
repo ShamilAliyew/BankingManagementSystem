@@ -14,7 +14,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 @Service
@@ -199,7 +198,7 @@ public class CardService {
                 BigDecimal cashbask = amount.multiply(BigDecimal.valueOf(0.05));
                 card.setCardBalance(card.getCardBalance().subtract(amount).add(cashbask));
             } else if (card.getCardType().name().equals(CardType.CREDIT.name())) {
-                card.setCardBalance(card.getCardBalance().add(amount));
+                card.setCardBalance(card.getCardBalance().subtract(amount));
                 if (card.getCardLimit().compareTo(card.getCardBalance()) < 0) {
                     throw new IllegalArgumentException("You have exceeded the limit assigned to the card.");
                 }
@@ -229,10 +228,20 @@ public class CardService {
                 .orElseThrow(()->new IllegalArgumentException("Sender card not found"));
         Card receiverCard = cardRepository.findByCardNumber(receiverCardNum)
                 .orElseThrow(()->new IllegalArgumentException("Receiver Card not found"));
-        if(senderCard.getCardBalance().compareTo(amount)< 0){
-            throw new IllegalArgumentException("Insufficient balance for transfer");
+
+        if(senderCard.getCardType().equals(CardType.DEBIT)) {
+            if(senderCard.getCardBalance().compareTo(amount)< 0 ){
+                throw new IllegalArgumentException("Insufficient balance for transfer");
+            }
+            senderCard.setCardBalance(senderCard.getCardBalance().subtract(amount));
+
         }
-        senderCard.setCardBalance(senderCard.getCardBalance().subtract(amount));
+        if(senderCard.getCardType().equals(CardType.CREDIT)){
+            if(senderCard.getCardLimit().compareTo(senderCard.getCardBalance().abs())<= 0 ){
+                throw new IllegalArgumentException("You are over the card limit.");
+            }
+            senderCard.setCardBalance(senderCard.getCardBalance().subtract(amount));
+        }
         receiverCard.setCardBalance(receiverCard.getCardBalance().add(amount));
 
         Transaction transaction = new Transaction();
@@ -281,19 +290,27 @@ public class CardService {
 
     }
 
+    public BigDecimal showBalance(String cardNum){
+        Card card=cardRepository.findByCardNumber(cardNum)
+                .orElseThrow(()->new IllegalArgumentException("Card not found"));
+
+        BigDecimal balance=card.getCardBalance();
+
+        return balance;
+    }
+
 
     @Transactional
     void deposit(String cardNumber, BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0){
             throw new IllegalArgumentException("Deposit amount must be greater than zero");
         }
         Card card = cardRepository.findByCardNumber(cardNumber)
                 .orElseThrow(() -> new RuntimeException("Card not found"));
 
 
-        if (card.getCardType().name().equals(CardType.DEBIT.name())) {
+        if (card.getCardType().name().equals(CardType.DEBIT.name())){
             card.setCardBalance(card.getCardBalance().add(amount));
-
             Transaction transaction = new Transaction();
             transaction.setAmount(amount);
             transaction.setTransactionType(TransactionType.DEPOSIT);
@@ -329,6 +346,29 @@ public class CardService {
             throw new IllegalArgumentException("Card limit cannot be negative");
         }
         card.setCardLimit(newLimit);
+        cardRepository.save(card);
+    }
+
+    public void blockCard(String cardNumber) {
+        Card card = cardRepository.findByCardNumber(cardNumber)
+                .orElseThrow(() -> new IllegalArgumentException("Card not found"));
+        if(!card.isActive()){
+           throw new IllegalArgumentException("Card is already blocked");        }
+        else{
+            card.setActive(false);
+        }
+        cardRepository.save(card);
+    }
+
+    public void activateCard(String cardNumber) {
+        Card card = cardRepository.findByCardNumber(cardNumber)
+                .orElseThrow(() -> new IllegalArgumentException("Card not found"));
+        if(card.isActive()){
+            throw new IllegalArgumentException("Card already activated");
+        }
+        else{
+            card.setActive(true);
+        }
         cardRepository.save(card);
     }
 
